@@ -1,0 +1,5 @@
+.dragSelectBox {
+    border: 1px solid blue;
+    background-color: lightskyblue;
+    position: absolute;
+}

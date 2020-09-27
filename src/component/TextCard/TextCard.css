@@ -1,0 +1,23 @@
+.card {
+    color: inherit;
+    text-decoration: inherit;
+}
+.preview-tooltip {
+    padding: 5px 5px 1px;
+    border-radius: 15px;
+    margin: 10px;
+}
+.preview-tooltip.show {
+    opacity: 1;
+}
+.preview-tooltip img {
+    height: 350px;
+}
+.preview-tooltip::before, .preview-tooltip::after {
+    display: none;
+}
+.tooltip-img {
+    background-image: url('../../image/mtg-card-back.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+}

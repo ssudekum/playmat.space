@@ -1,0 +1,9 @@
+.physical-card {
+    height: 300px;
+    position: absolute;
+    cursor: pointer;
+    background-image: url('../../image/mtg-card-back.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 1;
+}

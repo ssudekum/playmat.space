@@ -1,0 +1,33 @@
+.App {
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  position: relative;
+}
+
+
+@font-face {
+  font-family: 'Beleren';
+  src: url('font/Beleren2016-Bold.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Beleren', Fallback, sans-serif;
+}
+
+.hidden {
+    opacity: 0
+}
+
+.preview-tooltip.__react_component_tooltip {
+    padding: 5px 5px 0px;
+    border: 1px outset grey;
+    box-shadow: 3px 3px 3px;
+    position: absolute;
+    transition: opacity 0.15s ease-out;
+}
+.preview-tooltip.__react_component_tooltip.show {
+    opacity: 1;
+}

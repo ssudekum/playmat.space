@@ -1,0 +1,8 @@
+.playmat {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: transparent;
+    background-size: cover;
+    background-repeat: no-repeat;
+}

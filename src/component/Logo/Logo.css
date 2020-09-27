@@ -1,0 +1,90 @@
+
+.logo-container {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 64px;
+    user-select: none;
+}
+
+.logo-text {
+    font-size: 64px;
+    width: 100%;
+    text-shadow: 0px 0px 10px black;
+}
+
+.border {
+    background-color: white;
+    position: absolute;
+}
+
+.bottom-border {
+    height: 3px;
+    bottom: -20px;
+    width: 130%;
+    left: -15%;
+    animation: shrinkX 3s ease-out;
+}
+.left-border {
+    width: 3px;
+    height: 99px;
+    left: -15%;
+    bottom: -20px;
+    animation: growY 3s ease-out;
+}
+.top-left-border {
+    height: 3px;
+    top: -15px;
+    width: 75%;
+    left: -15%;
+    animation: growX 3s ease-out;
+}
+.right-border {
+    width: 3px;
+    height: 99px;
+    bottom: -20px;
+    right: -15%;
+    animation: growY 3s ease-out;
+}
+.top-right-border {
+    height: 3px;
+    top: -15px;
+    width: 75%;
+    right: -15%;
+    animation: growX 3s ease-out;
+}
+
+@keyframes growX {
+    from {
+        width: 0;
+    }
+    50% {
+        width: 0;
+    }
+    100% {
+        width: 75%;
+    }
+}
+
+@keyframes shrinkX {
+    from {
+        transform: scaleX(10);
+    }
+    85% {
+        transform: scaleX(1);
+    }
+}
+
+@keyframes growY {
+    from {
+        height: 0;
+    }
+    15% {
+        height: 0;
+    }
+    50% {
+        height: 99px;
+    }
+}
+
