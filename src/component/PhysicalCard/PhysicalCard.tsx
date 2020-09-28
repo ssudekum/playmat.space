@@ -25,13 +25,14 @@ const PhysicalCard : React.FC<PhysicalCardProps> = ({ card, onDoubleClick }) => 
 
     useEffect(() => {
         preview(getEmptyImage(), { captureDraggingState: true })
-    }, [])
+    }, [preview])
 
     return <>
         <img 
             id={`physical-card-${card.id}`} 
             className={`physical-card ${isDragging ? 'hidden' : ''}`}
             ref={drag}
+            alt="physical-card"
             src={card.image_uris ? card.image_uris.png : ''}
             onDoubleClick={onDoubleClick}
             onMouseDown={(e) => e.stopPropagation()}>

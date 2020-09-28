@@ -7,6 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import '@fortawesome/fontawesome-free/css/all.css';
 import Playmat from './component/Playmat/Playmat';
 import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
+import { SettingsButton } from './component/Settings/SettingsButton'
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
         </DndProvider>
         
         <Logo></Logo>
+        <SettingsButton></SettingsButton>
     </div>
     );
 }

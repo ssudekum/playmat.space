@@ -6,7 +6,7 @@ import Tooltip from 'react-tooltip';
 import { ItemTypes } from '../../lib/ItemTypes';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 
-type TextCardProps = {
+interface TextCardProps {
     card: Card
 }
 
@@ -20,7 +20,7 @@ const TextCard : React.FC<TextCardProps> = ({ card }) => {
 
     useEffect(() => {
         preview(getEmptyImage(), { captureDraggingState: true })
-    }, [])
+    }, [preview])
 
     const image = card.image_uris ? card.image_uris.png : "";
 

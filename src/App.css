@@ -18,7 +18,11 @@ body {
 }
 
 .hidden {
-    opacity: 0
+    opacity: 0 !important;
+}
+
+.show {
+    display: block !important;
 }
 
 .preview-tooltip.__react_component_tooltip {

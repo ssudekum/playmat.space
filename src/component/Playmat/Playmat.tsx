@@ -5,6 +5,7 @@ import './Playmat.css';
 import { ItemTypes } from '../../lib/ItemTypes';
 import PhysicalCard from '../PhysicalCard/PhysicalCard';
 import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox'
+import '../../image/goyf-playmat.jpg'
 
 interface DragObjectCard extends DragObjectWithType {
     card: Card
@@ -20,9 +21,8 @@ const Playmat : React.FC = () => {
         zIndex: zIndex + 1
     });
 
-    const [{ isOver, canDrop }, drop] = useDrop({
+    const [,drop] = useDrop({
         accept: ItemTypes.CARD,
-        canDrop: () => true,
         drop: (dragObject: DragObjectCard, target) => {
             addCard(dragObject.card, target);
         },
@@ -51,8 +51,16 @@ const Playmat : React.FC = () => {
         }
     }
 
+    let playmatImageSrc = '../../image/goyf-playmat.jpg'
+    let playmatStyle = {};
+    if (playmatImageSrc != null) {
+        playmatStyle = {
+            backgroundImage: `url(${playmatImageSrc})`
+        }
+    }
+
     return (
-        <div ref={drop} className="playmat" 
+        <div ref={drop} className="playmat" style={playmatStyle}
         onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => setDragSelectBoxProps({
             originX: event.pageX,
             originY: event.pageY,
