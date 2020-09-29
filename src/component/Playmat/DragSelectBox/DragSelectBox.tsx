@@ -6,7 +6,6 @@ export interface DragSelectBoxProps {
     originY: number,
     isDragging: boolean,
     zIndex: number,
-    // onMouseUpEvent: (event: {})
 }
 
 export interface DragSelectBoxStyle {

@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import '../PhysicalCard/PhysicalCard.css'
 
 export interface CardDragPreviewProps {
     src: string
@@ -7,7 +8,7 @@ export interface CardDragPreviewProps {
 export const CardDragPreview: React.FC<CardDragPreviewProps> = memo(
     ({ src }) => {
         return (
-            <img alt="card-preview" className='physical-card' src={src}></img>
+            <img alt="card-preview" className='physical-card-preview' src={src}></img>
         )
     }
 )

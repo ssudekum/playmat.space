@@ -1,11 +1,12 @@
 
 .logo-container {
     position: absolute;
+    pointer-events: none;
+    user-select: none;
     top: 100px;
     left: 50%;
     transform: translateX(-50%);
     height: 64px;
-    user-select: none;
 }
 
 .logo-text {

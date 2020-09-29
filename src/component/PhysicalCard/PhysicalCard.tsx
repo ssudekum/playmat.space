@@ -27,15 +27,35 @@ const PhysicalCard : React.FC<PhysicalCardProps> = ({ card, onDoubleClick }) => 
         preview(getEmptyImage(), { captureDraggingState: true })
     }, [preview])
 
+    const selectOnlyThis = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        event.currentTarget.setAttribute('selected', 'true') 
+        const playmatElem = document.getElementById('playmat');
+        if (!playmatElem) {
+            console.error("Error: could not locate Playmat element")
+            return
+        }
+
+        let cardElements : HTMLCollectionOf<Element> = playmatElem.getElementsByClassName('physical-card')
+        for (let [, cardElem] of Object.entries(cardElements)) {
+            if (cardElem && 
+                cardElem.getAttribute('id') !== `physical-card-${card.id}` && 
+                cardElem.getAttribute('selected') === 'true') {
+                cardElem.setAttribute('selected', 'false')
+            }
+        }
+
+        event.stopPropagation()
+    }
+
     return <>
         <img 
             id={`physical-card-${card.id}`} 
             className={`physical-card ${isDragging ? 'hidden' : ''}`}
             ref={drag}
-            alt="physical-card"
+            alt={card.name}
             src={card.image_uris ? card.image_uris.png : ''}
             onDoubleClick={onDoubleClick}
-            onMouseDown={(e) => e.stopPropagation()}>
+            onMouseDown={selectOnlyThis}>
         </img>
     </>
 }
