@@ -1,8 +1,17 @@
 import Identifiable from './Identifiable';
 
+/**
+ * This data structure is essentially an array of objects, with an associated map based on the "id" property of those objects.
+ * 
+ * CountedCollection maintains:
+ * - an array of Identifiable objects (objects with at least one property "id" of type string or number).
+ * - a Record of strings (the id of each Identifiable object) mapped to the "count" of that object.
+ * 
+ * The purpose of this data structure is to record the number/count of a given Identifiable object, storing only the 1 instance of that object. 
+ */
 export default class CountedCollection<T extends Identifiable> {
-    items: T[] = [];
-    counts:  Record<string | number, number> = {};
+    items: T[] = []; // the set of Identifiable objects for this collection
+    counts:  Record<string | number, number> = {}; // the map of item ids to their associated counts
 
     constructor(data: Partial<CountedCollection<T>> = {}) {
         Object.assign(this, data);
@@ -11,10 +20,41 @@ export default class CountedCollection<T extends Identifiable> {
         }
     }
 
+    /**
+     * Get the number of total items as a sum of the counts for each item id. 
+     */
+    public getTotalCount() {
+        let totalCount = 0;
+        for (let i = 0; i < this.items.length; i++) {
+            let item = this.items[i];
+            totalCount += this.counts[item.id];
+        }
+
+        return totalCount;
+    }
+
+    public addAll(data: CountedCollection<T>) {
+        for (let i = 0; i < data.items.length; i++) {
+            let item = data.items[i];
+            this.addMany(item, data.counts[item.id])
+        }
+    }
+
+    /**
+     * Add an item to the collection, incrementing that item's count if it already exists.
+     * 
+     * @param item the item to add/increment
+     */
     public add(item: T) {
         this.addMany(item, 1);
     }
 
+    /**
+     * Add some number to the count for a given item
+     * 
+     * @param item the item to add/increment
+     * @param count the number to add to the given item's count
+     */
     public addMany(item: T, count: number) {
         const existingCount = this.counts[item.id] ? this.counts[item.id] : 0;
         if (!existingCount) {
@@ -27,10 +67,21 @@ export default class CountedCollection<T extends Identifiable> {
         this.counts[item.id] = existingCount + count;
     }
 
+    /**
+     * Subtract 1 from the given item's count, removing that item if its count is equal to 1.
+     * 
+     * @param item the item to subtract/decrement
+     */
     public remove(item: T) {
         this.removeMany(item, 1);
     }
 
+    /**
+     * Subtract some number from the count for a given item.
+     * 
+     * @param item the item to subtract/decrement
+     * @param count the number to subtract from the given item's count
+     */
     public removeMany(item: T, count: number) {
         const existingCount = this.counts[item.id] ? this.counts[item.id] : 0;
         if (count > existingCount) {
@@ -53,6 +104,11 @@ export default class CountedCollection<T extends Identifiable> {
         this.counts[item.id] = existingCount - count;
     }
     
+    /**
+     * Remove an item from the collection.
+     * 
+     * @param item the item to remove
+     */
     public removeAll(item: T) {
         this.removeMany(item, this.items.length);
     }

@@ -9,11 +9,13 @@
     z-index: 2;
     transition: width 0.3s linear;
 }
+
 .toolbox-content {
     margin-top: 30px;
     opacity: 1;
     transition: opacity 0.3s linear;
 }
+
 .collapsible {
     font-size: 16px;
     cursor: pointer;

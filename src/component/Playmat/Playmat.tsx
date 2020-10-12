@@ -5,13 +5,17 @@ import './Playmat.css';
 import { ItemTypes } from '../../lib/ItemTypes';
 import PhysicalCard from '../PhysicalCard/PhysicalCard';
 import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox'
+import './Toolbox.css'
+import Deck from '../Deck/Deck';
 import playmatImage from '../../image/goyf-playmat.jpg'
+import CountedCollection from '../../lib/CountedCollection';
 
 interface DragObjectCard extends DragObjectWithType {
     card: Card
 }
 
 const Playmat : React.FC = () => {
+    const [toolboxIsVisible, setToolboxIsVisible] = useState(true);
     const [zIndex, setZIndex] = useState<number>(1)
     const [cards, setCards] = useState<Card[]>([])
     const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({ 
@@ -24,7 +28,7 @@ const Playmat : React.FC = () => {
     const [,drop] = useDrop({
         accept: ItemTypes.CARD,
         drop: (dragObject: DragObjectCard, target) => {
-            addCard(dragObject.card, target)
+            dropCard(dragObject.card, target)
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -59,7 +63,19 @@ const Playmat : React.FC = () => {
         };
     }, [cards])
 
-    const addCard = (card: Card, target: DropTargetMonitor) => {
+    const addCards = (adds: CountedCollection<Card>) => {
+        let totalAdds: Card[] = []
+        for (let i = 0; i < adds.items.length; i++) {
+            let card = adds.items[i]
+            for (let j = 0; j < adds.counts[card.id]; j++) {
+                totalAdds.push({ ...card })
+            }
+        }
+
+        setCards([ ...cards, ...totalAdds])
+    }
+
+    const dropCard = (card: Card, target: DropTargetMonitor) => {
         let cardIdx = cards.findIndex(c => c.id === card.id)
         if (cardIdx === -1) {
             setCards([ ...cards, card])
@@ -144,15 +160,23 @@ const Playmat : React.FC = () => {
         }
     }*/
 
-    return (
+    return <>
+        <div className={`toolbox ${(toolboxIsVisible ? '' : 'hidden-toolbox')}`}>
+            <i className={`fas fa-caret-square-left collapsible ${toolboxIsVisible ? '' : 'hidden-icon'}`} onClick={() => setToolboxIsVisible(false)}></i>
+            <i className={`fas fa-caret-square-right collapsible ${toolboxIsVisible ? 'hidden-icon' : ''}`} onClick={() => setToolboxIsVisible(true)}></i>
+            <div className={`toolbox-content ${(toolboxIsVisible ? '' : 'hidden-content')}`}>
+                <Deck addPlaymatCards={addCards}></Deck>
+            </div>
+        </div>
+
         <div ref={drop} id="playmat" className="playmat" style={playmatStyle}
-        onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => setDragSelectBoxProps({
-            originX: event.pageX,
-            originY: event.pageY,
-            isDragging: true,
-            zIndex: zIndex + 1
-        })} 
-        onMouseUp={onMouseUp}>
+            onMouseUp={onMouseUp}
+            onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => setDragSelectBoxProps({
+                originX: event.pageX,
+                originY: event.pageY,
+                isDragging: true,
+                zIndex: zIndex + 1
+            })}>
             <DragSelectBox {...dragSelectBoxProps}></DragSelectBox>
             {
                 cards.map((card) => 
@@ -167,7 +191,7 @@ const Playmat : React.FC = () => {
                 )
             }
         </div>
-    );
+    </>;
 }
 
 export default Playmat;

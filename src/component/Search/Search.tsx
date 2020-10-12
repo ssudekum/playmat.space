@@ -60,7 +60,7 @@ const Search : React.FC<{ onSelect: Function }> = props => {
 
     return <>
         <div className="input-container">
-            <input type="text" ref={searchInput} className="search-input" onChange={handleInput}></input>
+            <input type="text" ref={searchInput} className="search-input" onChange={handleInput} placeholder="Search for cards to add..."></input>
             <i className="fas fa-times clear-input" onClick={clear}></i>
         </div>
 
@@ -72,26 +72,9 @@ const Search : React.FC<{ onSelect: Function }> = props => {
                             results.map((card) => 
                                 <li key={card.id} onClick={(e) => props.onSelect(card)}>
                                     {card.name}
-                                    <i className="fas fa-camera preview-icon"
-                                        data-tip
-                                        data-for="image-preview"
-                                        onMouseEnter={() => getImageUri(card.id)}
-                                        onMouseLeave={() => getImageUri(card.id)}>
-                                    </i>
-                                </li>
-                            )
+                                </li>)
                         }
                     </ul>
-                    <Tooltip
-                        id="image-preview"
-                        className="preview-tooltip"
-                        place="right"
-                        type="light"
-                        effect="float">
-                        {
-                            hoverImage ? <img src={hoverImage} className='tooltip-img' alt="card-preview"></img> : "Image Unavailable"
-                        }
-                    </Tooltip>
                 </div> 
                 : 
                 badQuery 

@@ -4,7 +4,7 @@ import './Logo.css';
 export const Logo = () => 
     <div className="logo-container">
         <span className="logo-text">
-            MtG Zone
+            playmat.space
         </span>
         <div className="border top-left-border"></div>
         <div className="border top-right-border"></div>

@@ -25,6 +25,26 @@ body {
     display: block !important;
 }
 
+.button {
+    border-radius: 5px;
+    padding: 1%;
+    margin: 1%;
+    width: 49.5%;
+    margin-left: 0;
+    margin-right: 0;
+    float: left;
+}
+.button + .button {
+    margin-left: 1%;
+    margin-right: 0;
+}
+.button:hover {
+    cursor: pointer;
+}
+.button:disabled {
+    cursor: not-allowed;
+}
+
 .preview-tooltip.__react_component_tooltip {
     padding: 5px 5px 0px;
     border: 1px outset grey;

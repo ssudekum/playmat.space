@@ -1,9 +1,12 @@
-//TODO: implement CardFace interface
+// TODO: implement CardFace interface
 // TODO: implement Colors interface
 
 import ImageURI from "./ImageURI";
 import Identifiable from "./Identifiable";
 
+/**
+ * An interface representing Magic the Gathering cards results from the Scryfall API.
+ */
 export default interface Card extends Identifiable {
     
     // Core Card Fields

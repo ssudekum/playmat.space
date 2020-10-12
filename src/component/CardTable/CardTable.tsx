@@ -76,38 +76,40 @@ const CardTable : React.FC<TableProps> = props => {
             : <i className="fas fa-sort-up sort-icon active"></i>
         : null;
 
-    return <table ref={table} className="card-table">
-        <thead>
-            <tr>
-                <th onClick={() => applySort(0)}>
-                    # <span className="sort-icon-container">
-                        {displaySort(0)} <i className="fas fa-sort sort-icon"></i>
-                    </span>
-                </th>
-                <th onClick={() => applySort(1)}>
-                    CMC {displaySort(1)} <i className="fas fa-sort sort-icon"></i>
-                </th>
-                <th onClick={() => applySort(2)}>
-                    Name {displaySort(2)} <i className="fas fa-sort sort-icon"></i>
-                </th>
-                <th onClick={() => applySort(3)}>
-                    Type {displaySort(3)} <i className="fas fa-sort sort-icon"></i>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {
-                props.cards.items.map((card) => {
-                    return <tr key={`table-row-${card.id}`}>
-                        <td>{props.cards.counts[card.id]}</td>
-                        <td>{card.mana_cost ? card.cmc : "-"}</td>
-                        <TextCard card={card}></TextCard>
-                        <td>{card.type_line}</td>
-                    </tr>
-                })
-            }
-        </tbody>
-    </table>
+    return <div className="table-container">
+        <table ref={table} className="card-table">
+            <thead>
+                <tr>
+                    <th onClick={() => applySort(0)}>
+                        # <span className="sort-icon-container">
+                            {displaySort(0)} <i className="fas fa-sort sort-icon"></i>
+                        </span>
+                    </th>
+                    <th onClick={() => applySort(1)}>
+                        CMC {displaySort(1)} <i className="fas fa-sort sort-icon"></i>
+                    </th>
+                    <th onClick={() => applySort(2)}>
+                        Name {displaySort(2)} <i className="fas fa-sort sort-icon"></i>
+                    </th>
+                    <th onClick={() => applySort(3)}>
+                        Type {displaySort(3)} <i className="fas fa-sort sort-icon"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    props.cards.items.map((card) => {
+                        return <tr key={`table-row-${card.id}`}>
+                            <td>{props.cards.counts[card.id]}</td>
+                            <td>{card.mana_cost ? card.cmc : "-"}</td>
+                            <TextCard card={card}></TextCard>
+                            <td>{card.type_line}</td>
+                        </tr>
+                    })
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 export default CardTable;
