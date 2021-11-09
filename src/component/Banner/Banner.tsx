@@ -1,9 +1,12 @@
-import React from 'react';
+import React, {FC} from 'react';
 import './Banner.css';
 
-export const Banner = () => 
+export const Banner: FC = (props) => {
+  return (
     <div className="banner">
-        Under Construction
+      {props.children}
     </div>
+  );
+}
 
 export default Banner;

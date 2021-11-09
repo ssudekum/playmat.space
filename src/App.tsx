@@ -18,7 +18,7 @@ function App() {
         </DndProvider>
         
         <Logo></Logo>
-        <Banner></Banner>
+        <Banner>Under Construction</Banner>
         <SettingsButton></SettingsButton>
     </div>
     );

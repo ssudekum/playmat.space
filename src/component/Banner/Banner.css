@@ -1,15 +1,15 @@
 .banner {
-    position: absolute;
-    top: 0;
-    right: -30%;
-    transform: rotate(35deg);
-    width: 100%;
-    height: 100px;
-    background-color: #ffea00;
-    font-size: 50px;
-    color: black;
-    padding-top: 25px;
-    padding-left: 21%;
-    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
-    box-shadow: 5px 5px 5px black;
+  position: absolute;
+  top: 0;
+  right: -30%;
+  transform: rotate(35deg);
+  width: 100%;
+  height: 100px;
+  background-color: #ffea00;
+  font-size: 50px;
+  color: black;
+  padding-top: 25px;
+  padding-left: 21%;
+  text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  box-shadow: 5px 5px 5px black;
 }
