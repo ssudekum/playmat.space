@@ -1,15 +1,14 @@
-import React from 'react';
+import React, {FC} from 'react';
 
-export interface SettingsModalProps {
-    visible: boolean,
-    setVisible: (visible: boolean) => void
+export type SettingsModalProps = {
+  visible: boolean,
+  setVisible: (visible: boolean) => void
 }
 
-export const SettingsModal : React.FC<SettingsModalProps> = ({ visible, setVisible }) => {
+const SettingsModal: FC<SettingsModalProps> = ({ visible, setVisible }) => (
+  <div className={`settingsModal ${visible ? '' : 'hidden'}`}>
+    <i className="fas fa-times close" onClick={() => setVisible(false)}></i>
+  </div>
+);
 
-    return <>
-        <div className={`settingsModal ${visible ? '' : 'hidden'}`}>
-            <i className="fas fa-times close" onClick={() => setVisible(false)}></i>
-        </div>
-    </>
-}
+export default SettingsModal;

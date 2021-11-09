@@ -18,41 +18,41 @@ body {
 }
 
 .hidden {
-    opacity: 0 !important;
+  opacity: 0 !important;
 }
 
 .show {
-    display: block !important;
+  display: block !important;
 }
 
 .button {
-    border-radius: 5px;
-    padding: 1%;
-    margin: 1%;
-    width: 49.5%;
-    margin-left: 0;
-    margin-right: 0;
-    float: left;
+  border-radius: 5px;
+  padding: 1%;
+  margin: 1%;
+  width: 49.5%;
+  margin-left: 0;
+  margin-right: 0;
+  float: left;
 }
 .button + .button {
-    margin-left: 1%;
-    margin-right: 0;
+  margin-left: 1%;
+  margin-right: 0;
 }
 .button:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 .button:disabled {
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
 .preview-tooltip.__react_component_tooltip {
-    padding: 5px 5px 0px;
-    border: 1px outset grey;
-    border-radius: 15px;
-    box-shadow: 3px 3px 3px;
-    position: absolute;
-    transition: opacity 0.15s ease-out;
+  padding: 5px 5px 0px;
+  border: 1px outset grey;
+  border-radius: 15px;
+  box-shadow: 3px 3px 3px;
+  position: absolute;
+  transition: opacity 0.15s ease-out;
 }
 .preview-tooltip.__react_component_tooltip.show {
-    opacity: 1;
+  opacity: 1;
 }

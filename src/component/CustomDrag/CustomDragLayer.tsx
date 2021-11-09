@@ -1,7 +1,7 @@
 import React from 'react'
 import { XYCoord, useDragLayer } from 'react-dnd'
-import { ItemTypes } from '../../lib/ItemTypes'
-import { CardDragPreview } from './CardDragPreview'
+import { Draggable } from '../../lib/Draggable'
+import CardDragPreview from './CardDragPreview'
 
 const layerStyles: React.CSSProperties = {
   position: 'fixed',
@@ -46,7 +46,7 @@ export const CustomDragLayer: React.FC = () => {
 
   function renderItem() {
     switch (itemType) {
-      case ItemTypes.CARD:
+      case Draggable.CARD:
         return <CardDragPreview src={item.card.image_uris ? item.card.image_uris.png : ''} />
       default:
         return null

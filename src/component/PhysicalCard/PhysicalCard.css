@@ -1,26 +1,26 @@
 .physical-card {
-    height: 300px;
-    border-radius: 15px;
-    position: absolute;
-    cursor: pointer;
-    background-image: url('../../image/mtg-card-back.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    z-index: 1;
+  height: 300px;
+  border-radius: 15px;
+  position: absolute;
+  cursor: pointer;
+  background-image: url('../../image/mtg-card-back.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 1;
 }
 
 .physical-card[selected=true] {
-    box-shadow: 0 0 5px 1px skyblue;
+  box-shadow: 0 0 5px 1px skyblue;
 }
 
 .physical-card-preview {
-    height: 300px;
-    border-radius: 15px;
-    position: absolute;
-    cursor: pointer;
-    background-image: url('../../image/mtg-card-back.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    z-index: 1;
-    box-shadow: 0 0 5px 1px skyblue;
+  height: 300px;
+  border-radius: 15px;
+  position: absolute;
+  cursor: pointer;
+  background-image: url('../../image/mtg-card-back.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 1;
+  box-shadow: 0 0 5px 1px skyblue;
 }

@@ -1,65 +1,65 @@
 import React from 'react';
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import './PhysicalCard.css';
 import Card from '../../lib/Card';
-import { ItemTypes } from '../../lib/ItemTypes';
-import { getEmptyImage } from 'react-dnd-html5-backend'
+import { Draggable } from '../../lib/Draggable';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 
-interface PhysicalCardProps {
-    num: number,
-    card: Card,
-    onDoubleClick: DoubleClickFunction
-}
+type PhysicalCardProps = {
+  num: number,
+  card: Card,
+  onDoubleClick: DoubleClickFunction
+};
 
-interface DoubleClickFunction {
-    (event: React.MouseEvent<HTMLImageElement, MouseEvent>): void
-}
+type DoubleClickFunction = {
+  (event: React.MouseEvent<HTMLImageElement, MouseEvent>): void
+};
 
-const PhysicalCard : React.FC<PhysicalCardProps> = ({ num, card, onDoubleClick }) => {
-    let id = `physical-card-${card.id}-${num}`;
-    const [{ isDragging }, drag, preview] = useDrag({
-        item: { type: ItemTypes.CARD, id: id, card: card },
-        collect: (monitor: DragSourceMonitor) => ({
-            isDragging: monitor.isDragging(),
-        }),
-    });
+const PhysicalCard: React.FC<PhysicalCardProps> = ({ num, card, onDoubleClick }) => {
+  let id = `physical-card-${card.id}-${num}`;
+  const [{ isDragging }, drag, preview] = useDrag({
+    item: { type: Draggable.CARD, id: id, card: card },
+    collect: (monitor: DragSourceMonitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
 
-    useEffect(() => {
-        preview(getEmptyImage(), { captureDraggingState: true })
-    }, [preview])
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true })
+  }, [preview])
 
-    const selectOnlyThis = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-        event.currentTarget.setAttribute('selected', 'true') 
-        const playmatElem = document.getElementById('playmat');
-        if (!playmatElem) {
-            console.error("Error: could not locate Playmat element")
-            return
-        }
-
-        let cardElements : HTMLCollectionOf<Element> = playmatElem.getElementsByClassName('physical-card')
-        for (let [, cardElem] of Object.entries(cardElements)) {
-            if (cardElem && 
-                cardElem.getAttribute('id') !== id && 
-                cardElem.getAttribute('selected') === 'true') {
-                cardElem.setAttribute('selected', 'false')
-            }
-        }
-
-        event.stopPropagation()
+  const selectOnlyThis = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    event.currentTarget.setAttribute('selected', 'true');
+    const playmatElem = document.getElementById('playmat');
+    if (!playmatElem) {
+      console.error("Error: could not locate Playmat element");
+      return;
     }
 
-    return <>
-        <img 
-            id={id} 
-            className={`physical-card ${isDragging ? 'hidden' : ''}`}
-            ref={drag}
-            alt={card.name}
-            src={card.image_uris ? card.image_uris.png : ''}
-            onDoubleClick={onDoubleClick}
-            onMouseDown={selectOnlyThis}>
-        </img>
-    </>
+    let cardElements = playmatElem.getElementsByClassName('physical-card');
+    for (let [, cardElem] of Object.entries(cardElements)) {
+      if (cardElem &&
+        cardElem.getAttribute('id') !== id &&
+        cardElem.getAttribute('selected') === 'true') {
+        cardElem.setAttribute('selected', 'false')
+      }
+    }
+
+    event.stopPropagation();
+  }
+
+  return <>
+    <img
+      id={id}
+      ref={drag}
+      className={`physical-card ${isDragging ? 'hidden' : ''}`}
+      alt={card.name}
+      src={card.image_uris ? card.image_uris.png : ''}
+      onDoubleClick={onDoubleClick}
+      onMouseDown={selectOnlyThis}>
+    </img>
+  </>
 }
 
 export default PhysicalCard;

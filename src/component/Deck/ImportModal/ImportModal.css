@@ -1,16 +1,16 @@
 textarea {
-    height: 200px;
-    width: 500px;
+  height: 200px;
+  width: 500px;
 }
 
 #importModal {
-    width: auto;
-    height: auto;
-    padding-left: 0;
-    padding-right: 0;
+  width: auto;
+  height: auto;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #importButton {
-    width: 90%;
-    float: none;
+  width: 90%;
+  float: none;
 }
