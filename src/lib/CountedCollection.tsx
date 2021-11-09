@@ -14,8 +14,21 @@ export default class CountedCollection<T extends Identifiable> {
     counts:  Record<string | number, number> = {}; // the map of item ids to their associated counts
 
     constructor(data: Partial<CountedCollection<T>> = {}) {
-        Object.assign(this, data);
-        if (!data.counts) {
+        let copy: Partial<CountedCollection<T>> = {
+            items: [],
+            counts: {}
+        }
+
+        if (data.items) {
+            copy.items = [...data.items]
+        }
+        if (data.counts) {
+            copy.counts = {...data.counts}
+        } 
+        
+        Object.assign(this, copy);
+        
+        if (!this.counts) {
             this.items.forEach((item) => this.counts[item.id] = 1);
         }
     }
@@ -33,10 +46,10 @@ export default class CountedCollection<T extends Identifiable> {
         return totalCount;
     }
 
-    public addAll(data: CountedCollection<T>) {
+    public addCollection(data: CountedCollection<T>) {
         for (let i = 0; i < data.items.length; i++) {
             let item = data.items[i];
-            this.addMany(item, data.counts[item.id])
+            this.add(item, data.counts[item.id])
         }
     }
 
@@ -45,8 +58,8 @@ export default class CountedCollection<T extends Identifiable> {
      * 
      * @param item the item to add/increment
      */
-    public add(item: T) {
-        this.addMany(item, 1);
+    public addOne(item: T) {
+        this.add(item, 1);
     }
 
     /**
@@ -55,7 +68,7 @@ export default class CountedCollection<T extends Identifiable> {
      * @param item the item to add/increment
      * @param count the number to add to the given item's count
      */
-    public addMany(item: T, count: number) {
+    public add(item: T, count: number) {
         const existingCount = this.counts[item.id] ? this.counts[item.id] : 0;
         if (!existingCount) {
             this.items = [
@@ -72,8 +85,8 @@ export default class CountedCollection<T extends Identifiable> {
      * 
      * @param item the item to subtract/decrement
      */
-    public remove(item: T) {
-        this.removeMany(item, 1);
+    public subtractOne(item: T) {
+        this.subtract(item, 1);
     }
 
     /**
@@ -82,7 +95,7 @@ export default class CountedCollection<T extends Identifiable> {
      * @param item the item to subtract/decrement
      * @param count the number to subtract from the given item's count
      */
-    public removeMany(item: T, count: number) {
+    public subtract(item: T, count: number) {
         const existingCount = this.counts[item.id] ? this.counts[item.id] : 0;
         if (count > existingCount) {
             count = existingCount;
@@ -110,7 +123,7 @@ export default class CountedCollection<T extends Identifiable> {
      * @param item the item to remove
      */
     public removeAll(item: T) {
-        this.removeMany(item, this.items.length);
+        this.subtract(item, this.items.length);
     }
 }
 

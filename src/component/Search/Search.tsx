@@ -70,7 +70,10 @@ const Search : React.FC<{ onSelect: Function }> = props => {
                     <ul>
                         {
                             results.map((card) => 
-                                <li key={card.id} onClick={(e) => props.onSelect(card)}>
+                                <li key={card.id} onClick={(e) => {
+                                    props.onSelect(card)
+                                    clear();
+                                }}>
                                     {card.name}
                                 </li>)
                         }

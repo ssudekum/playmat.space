@@ -15,12 +15,12 @@ const Deck : React.FC<DeckProps> = ({ addPlaymatCards }) => {
     const [cards, setCards] = useState<CountedCollection<Card>>(new CountedCollection());
     
     const onSelect = (card: Card) => {
-        cards.add(card);
+        cards.addOne(card);
         setCards(new CountedCollection(cards));
     };
 
     const onImport = (data: CountedCollection<Card>) => {
-        cards.addAll(data)
+        cards.addCollection(data)
         setCards(new CountedCollection(cards));
     }
 

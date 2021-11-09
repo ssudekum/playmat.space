@@ -7,6 +7,7 @@ import { ItemTypes } from '../../lib/ItemTypes';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 
 interface PhysicalCardProps {
+    num: number,
     card: Card,
     onDoubleClick: DoubleClickFunction
 }
@@ -15,9 +16,10 @@ interface DoubleClickFunction {
     (event: React.MouseEvent<HTMLImageElement, MouseEvent>): void
 }
 
-const PhysicalCard : React.FC<PhysicalCardProps> = ({ card, onDoubleClick }) => {
+const PhysicalCard : React.FC<PhysicalCardProps> = ({ num, card, onDoubleClick }) => {
+    let id = `physical-card-${card.id}-${num}`;
     const [{ isDragging }, drag, preview] = useDrag({
-        item: { type: ItemTypes.CARD, card: card },
+        item: { type: ItemTypes.CARD, id: id, card: card },
         collect: (monitor: DragSourceMonitor) => ({
             isDragging: monitor.isDragging(),
         }),
@@ -38,7 +40,7 @@ const PhysicalCard : React.FC<PhysicalCardProps> = ({ card, onDoubleClick }) => 
         let cardElements : HTMLCollectionOf<Element> = playmatElem.getElementsByClassName('physical-card')
         for (let [, cardElem] of Object.entries(cardElements)) {
             if (cardElem && 
-                cardElem.getAttribute('id') !== `physical-card-${card.id}` && 
+                cardElem.getAttribute('id') !== id && 
                 cardElem.getAttribute('selected') === 'true') {
                 cardElem.setAttribute('selected', 'false')
             }
@@ -49,7 +51,7 @@ const PhysicalCard : React.FC<PhysicalCardProps> = ({ card, onDoubleClick }) => 
 
     return <>
         <img 
-            id={`physical-card-${card.id}`} 
+            id={id} 
             className={`physical-card ${isDragging ? 'hidden' : ''}`}
             ref={drag}
             alt={card.name}

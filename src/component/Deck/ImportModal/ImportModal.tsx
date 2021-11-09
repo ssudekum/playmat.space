@@ -46,7 +46,7 @@ export const ImportModal : React.FC<ImportModalProps> = ({ visible, setVisible, 
                     let cardResults: Card[] = results[j]
                     for (let k = 0; k < cardResults.length; k++) {
                         let card = cardResults[k]
-                        totalCardResults.addMany(card, counts[card.name])
+                        totalCardResults.add(card, counts[card.name])
                     }
                 }
 
