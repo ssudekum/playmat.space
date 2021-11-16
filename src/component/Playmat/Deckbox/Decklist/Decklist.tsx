@@ -1,14 +1,9 @@
-import React, { FC, useMemo, useRef, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import './Decklist.css';
 import Card from '../../../../lib/Card';
 import CountedCollection from '../../../../lib/CountedCollection';
 import TextCard from '../../../TextCard/TextCard';
 import Table, { TableColumn } from '../../../Table/Table';
-
-enum SortDirection {
-  "ASC",
-  "DESC"
-};
 
 type TableProps = {
   cards: CountedCollection<Card>

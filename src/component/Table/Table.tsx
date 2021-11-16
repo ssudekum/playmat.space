@@ -30,31 +30,30 @@ const SortableTable: FC<TableProps> = (props) => {
   const [sortBy, setSortBy] = useState(initialSortField ?? columns[0]?.field);
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  const getRow = (row: Record<string, any>, idx: number) => (
-    <TableRow key={idx}>
-      {
-        columns?.map((column, idx) => {
-          const {field, formatter} = column;
-          const data = row[field];
-          const cell = formatter ? formatter(data, row) : data;
-          return (
-            <TableCell key={idx}>
-              {cell}
-            </TableCell>
-          );
-        })
-      }
-    </TableRow>
-  );
-
   const tableRows = useMemo(() => {
     if (rows?.length) {
       const column = columns?.find(column => column.field === sortBy);
       const comparator = column?.getComparator
         ? column.getComparator(sortDirection)
         : naturalSort(sortDirection);
+      
       rows.sort(comparator);
-      return rows.map(getRow);
+      return rows.map((row: Record<string, any>, idx: number) => (
+        <TableRow key={idx}>
+          {
+            columns?.map((column, idx) => {
+              const {field, formatter} = column;
+              const data = row[field];
+              const cell = formatter ? formatter(data, row) : data;
+              return (
+                <TableCell key={idx}>
+                  {cell}
+                </TableCell>
+              );
+            })
+          }
+        </TableRow>
+      ));
     }
   }, [columns, rows, sortBy, sortDirection]);
 

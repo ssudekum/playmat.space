@@ -6,18 +6,24 @@ import Card from '../../lib/Card';
 import { Draggable } from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 
-type PhysicalCardProps = {
-  num: number,
-  card: Card,
-  onDoubleClick: DoubleClickFunction
+export type CardPosition = {
+  top: number;
+  left: number;
+  zIndex: number;
+};
+
+export type PhysicalCardProps = {
+  id: string;
+  card: Card;
+  position: CardPosition;
+  onDoubleClick: DoubleClickFunction;
 };
 
 type DoubleClickFunction = {
   (event: React.MouseEvent<HTMLImageElement, MouseEvent>): void
 };
 
-const PhysicalCard: React.FC<PhysicalCardProps> = ({ num, card, onDoubleClick }) => {
-  let id = `physical-card-${card.id}-${num}`;
+const PhysicalCard: React.FC<PhysicalCardProps> = ({ id, card, position, onDoubleClick }) => {
   const [{ isDragging }, drag, preview] = useDrag({
     item: { type: Draggable.CARD, id: id, card: card },
     collect: (monitor: DragSourceMonitor) => ({
@@ -49,17 +55,22 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({ num, card, onDoubleClick })
     event.stopPropagation();
   }
 
-  return <>
+  return (
     <img
       id={id}
       ref={drag}
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        zIndex: position.zIndex,
+      }}
       className={`physical-card ${isDragging ? 'hidden' : ''}`}
       alt={card.name}
       src={card.image_uris ? card.image_uris.png : ''}
       onDoubleClick={onDoubleClick}
       onMouseDown={selectOnlyThis}>
     </img>
-  </>
+  );
 }
 
 export default PhysicalCard;
