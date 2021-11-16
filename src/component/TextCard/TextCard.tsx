@@ -5,6 +5,7 @@ import Card from '../../lib/Card';
 import Tooltip from 'react-tooltip';
 import { Draggable } from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend'
+import { createPortal } from 'react-dom';
 
 type TextCardProps = {
   card: Card
@@ -25,19 +26,22 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
   const image = card.image_uris ? card.image_uris.png : "";
   
   const tooltip = () => (
-    <Tooltip
-      id={`card-preview-${card.id}`}
-      className="preview-tooltip"
-      place="right"
-      type="light"
-      effect="float"
-    >
-      {
-        image 
-          ? <img src={image} className='tooltip-img' alt="card-preview"></img> 
-          : "Image Unavailable"
-      }
-    </Tooltip>
+    createPortal(
+      <Tooltip
+        id={`card-preview-${card.id}`}
+        className="preview-tooltip"
+        place="right"
+        type="light"
+        effect="float"
+      >
+        {
+          image 
+            ? <img src={image} className='tooltip-img' alt="card-preview"></img> 
+            : "Image Unavailable"
+        }
+      </Tooltip>,
+      document.body
+    )
   );
 
   const openLink = () => {
@@ -48,7 +52,7 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
   };
 
   return (
-    <td 
+    <div 
       ref={drag}
       data-tip
       data-for={`card-preview-${card.id}`}
@@ -57,7 +61,7 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
     >
       {card.name}
       {isDragging ? null : tooltip()}
-    </td>
+    </div>
   );
 }
 

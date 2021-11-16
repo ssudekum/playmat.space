@@ -1,4 +1,4 @@
-.toolbox {
+.deckbox {
   position: fixed;
   left: 0;
   height: 100vh;
@@ -10,10 +10,17 @@
   transition: width 0.3s linear;
 }
 
-.toolbox-content {
+.deckbox-content {
   margin-top: 30px;
   opacity: 1;
   transition: opacity 0.3s linear;
+  height: 100%;
+}
+
+.decklist-container {
+  overflow-x: hidden;
+  position: relative;
+  height: 100%;
 }
 
 .collapsible {
@@ -22,7 +29,7 @@
   float: right;
 }
 
-.hidden-toolbox {
+.hidden-deckbox {
   width: 34px;
 }
 

@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
-import './Search.css'
-import Card from '../../lib/Card';
+import './CardSearch.css'
+import Card from '../../../../lib/Card';
 
-const Search: React.FC<{ onSelect: Function }> = props => {
+const CardSearch: React.FC<{ onSelect: Function }> = props => {
   const [token, setToken] = useState(() => () => { });
   const [results, setResults] = useState<Card[]>([]);
   const [badQuery, setBadQuery] = useState(false);
@@ -84,4 +84,4 @@ const Search: React.FC<{ onSelect: Function }> = props => {
   </>
 }
 
-export default Search;
+export default CardSearch;

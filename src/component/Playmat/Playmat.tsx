@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, useMemo } from 'react'
 import { useDrop, DragObjectWithType, DropTargetMonitor } from 'react-dnd'
 import Card from '../../lib/Card'
 import './Playmat.css'
 import { Draggable } from '../../lib/Draggable'
 import PhysicalCard from '../PhysicalCard/PhysicalCard'
 import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox'
-import './Toolbox.css'
-import Deck from '../Deck/Deck'
 import playmatImage from '../../image/goyf-playmat.jpg'
-import CountedCollection from '../../lib/CountedCollection'
+import CountedCollection from '../../lib/CountedCollection';
+import Deckbox from './Deckbox/Deckbox';
 
-interface DragObjectCard extends DragObjectWithType {
+type DragObjectCard = DragObjectWithType & {
   id: string
   card: Card
 };
 
-const Playmat: React.FC = () => {
-  const [toolboxIsVisible, setToolboxIsVisible] = useState(true);
+let playmatStyle = {};
+if (playmatImage) {
+  playmatStyle = {
+    backgroundImage: `url(${playmatImage})`
+  }
+}
+
+const Playmat: FC = () => {
   const [zIndex, setZIndex] = useState(1);
   const [cards, setCards] = useState(new CountedCollection<Card>());
   const [positionMap, setPositionMap] = useState<Record<string, Partial<CSSStyleDeclaration>>>({});
@@ -36,25 +41,23 @@ const Playmat: React.FC = () => {
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
-  })
+  });
 
   useEffect(() => {
     const eventListener = (event: KeyboardEvent) => {
       if (event.key === 'Backspace' || event.key === 'Delete') {
-        let cardsCopy = new CountedCollection(cards)
+        let cardsCopy = new CountedCollection(cards);
         for (let [, card] of Object.entries(cardsCopy.items)) {
           const count = cardsCopy.counts[card.id]
           for (let i = 1; i <= count; i++) {
-            let cardElem = document.getElementById(`physical-card-${card.id}-${i}`)
-            debugger;
+            let cardElem = document.getElementById(`physical-card-${card.id}-${i}`);
             if (cardElem && cardElem.getAttribute('selected') === 'true') {
-              cardsCopy.subtractOne(card)
-              console.log(cardsCopy.counts[card.id])
+              cardsCopy.subtractOne(card);
             }
           }
         }
 
-        setCards(cardsCopy)
+        setCards(cardsCopy);
       }
     }
 
@@ -62,7 +65,7 @@ const Playmat: React.FC = () => {
     return () => {
       document.removeEventListener('keydown', eventListener);
     };
-  }, [cards])
+  }, []);
 
   const addCards = (adds: CountedCollection<Card>) => {
     let cardsCopy = new CountedCollection(cards);
@@ -72,6 +75,7 @@ const Playmat: React.FC = () => {
 
   const dropCard = (id: string, card: Card, target: DropTargetMonitor) => {
     const offset = target.getSourceClientOffset();
+    console.log(offset);
     if (offset) {
       const top = `${offset.y}px`;
       const left = `${offset.x}px`;
@@ -158,50 +162,47 @@ const Playmat: React.FC = () => {
     }
   }
 
-  let playmatStyle = {};
-  /*(if (playmatImage) {
-      playmatStyle = {
-          backgroundImage: `url(${playmatImage})`
+  const getPhysicalCard = (card: Card, index: number) => (
+    <PhysicalCard
+      num={index}
+      card={card}
+      key={`${card.id}-${index}`}
+      onDoubleClick={(event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        setZIndex(zIndex + 1);
+        event.currentTarget.style.zIndex = (zIndex).toString();
+      }}>
+    </PhysicalCard>
+  );
+
+  const physicalCards = useMemo(() => {
+    return cards.items.map((card) => {
+      let elements = [];
+      let count = cards.counts[card.id];
+      for (let i = 1; i <= count; i++) {
+        elements.push(getPhysicalCard(card, i));
       }
-  }*/
+
+      return elements
+    });
+  }, [cards]);
 
   return <>
-    <div className={`toolbox ${(toolboxIsVisible ? '' : 'hidden-toolbox')}`}>
-      <i className={`fas fa-caret-square-left collapsible ${toolboxIsVisible ? '' : 'hidden-icon'}`} onClick={() => setToolboxIsVisible(false)}></i>
-      <i className={`fas fa-caret-square-right collapsible ${toolboxIsVisible ? 'hidden-icon' : ''}`} onClick={() => setToolboxIsVisible(true)}></i>
-      <div className={`toolbox-content ${(toolboxIsVisible ? '' : 'hidden-content')}`}>
-        <Deck addPlaymatCards={addCards}></Deck>
-      </div>
-    </div>
-
-    <div ref={drop} id="playmat" className="playmat" style={playmatStyle}
+    <Deckbox addPlaymatCards={addCards} />
+    <div 
+      ref={drop} 
+      id="playmat" 
+      className="playmat" 
+      style={playmatStyle}
       onMouseUp={onMouseUp}
       onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => setDragSelectBoxProps({
         originX: event.pageX,
         originY: event.pageY,
         isDragging: true,
         zIndex: zIndex + 1
-      })}>
-      <DragSelectBox {...dragSelectBoxProps}></DragSelectBox>
-      {
-        cards.items.map((card) => {
-          let count = cards.counts[card.id]
-          let elements = []
-          for (let i = 1; i <= count; i++) {
-            elements.push(<PhysicalCard
-              card={card}
-              num={i}
-              key={`${card.id}-${i}`}
-              onDoubleClick={(event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-                setZIndex(zIndex + 1)
-                event.currentTarget.style.zIndex = (zIndex).toString()
-              }}>
-            </PhysicalCard>)
-          }
-
-          return elements
-        })
-      }
+      })}
+    >
+      <DragSelectBox {...dragSelectBoxProps} />
+      {physicalCards}
     </div>
   </>;
 }
