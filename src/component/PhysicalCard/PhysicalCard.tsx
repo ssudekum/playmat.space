@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useEffect } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import './PhysicalCard.css';
@@ -32,6 +32,8 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   selectedCards, 
   setSelectedCards
 }) => {
+  const [isTapped, setIsTapped] = useState(false);
+
   const selectedCard = useMemo(() => ({
     id: id,
     image: card.image_uris?.png,
@@ -67,18 +69,8 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   const select = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
     event.stopPropagation();
     if (isSelected()) return;
-  
-    const nextSelectedCards = [...selectedCards];
-    nextSelectedCards.push(selectedCard);
+    const nextSelectedCards = [selectedCard];
     setSelectedCards(nextSelectedCards);
-  };
-
-  const deselectOthers = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    setSelectedCards([selectedCard]);
-  };
-
-  const tapUntap = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-
   };
 
   const classNames = useMemo(() => {
@@ -89,8 +81,13 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
         classNames.push('hidden');
       }
     }
+
+    if (isTapped) {
+      classNames.push('tapped');
+    }
+
     return classNames;
-  }, [isDraggingCards, isSelected]);
+  }, [isDraggingCards, isSelected, isTapped]);
 
   return (
     <img
@@ -104,9 +101,8 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
       className={`physical-card ${classNames.join(' ')}`}
       alt={card.name}
       src={card.image_uris ? card.image_uris.png : ''}
-      onDoubleClick={tapUntap}
-      onMouseDown={select}
-      onClick={deselectOthers}>
+      onDoubleClick={() => setIsTapped(tapped => !tapped)}
+      onMouseDown={select}>
     </img>
   );
 }
