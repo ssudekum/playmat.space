@@ -10,7 +10,6 @@ import SettingsButton from './component/Settings/SettingsButton';
 import Banner from './component/Banner/Banner';
 
 const App: FC = () => {
-  console.log("page render");
   return (
     <div id="app" className="App">
       <DndProvider backend={HTML5Backend}>

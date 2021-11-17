@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect, useMemo } from 'react'
-import { useDrop, DragObjectWithType, DropTargetMonitor } from 'react-dnd'
+import { useDrop, DropTargetMonitor } from 'react-dnd'
 import Card from '../../lib/Card'
 import './Playmat.css'
 import { Draggable } from '../../lib/Draggable'
@@ -8,11 +8,7 @@ import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox
 import playmatImage from '../../image/goyf-playmat.jpg'
 import CountedCollection from '../../lib/CountedCollection';
 import Deckbox from './Deckbox/Deckbox';
-
-type DragObjectCard = DragObjectWithType & {
-  id: string
-  card: Card
-};
+import { PhysicalCardsDO, SelectedCard, TextCardDO } from '../CustomDrag/CustomDragLayer'
 
 export type PlaymatCard = {
   card: Card;
@@ -31,6 +27,8 @@ if (playmatImage) {
 const Playmat: FC = () => {
   const [cardStack, setCardStack] = useState<PlaymatCard[]>([]);
   const [cardCollection, setCardCollection] = useState(new CountedCollection<Card>());
+  const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
+  const [isDraggingCards, setIsDraggingCards] = useState(false);
   const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({
     originX: 0,
     originY: 0,
@@ -39,9 +37,14 @@ const Playmat: FC = () => {
   });
 
   const [, drop] = useDrop({
-    accept: Draggable.CARD,
-    drop: (dragObject: DragObjectCard, target) => {
-      dropCard(dragObject.id, dragObject.card, target)
+    accept: [Draggable.PHYSICAL_CARDS, Draggable.TEXT_CARD],
+    drop: (item: PhysicalCardsDO | TextCardDO, target) => {
+      if (item.type === Draggable.PHYSICAL_CARDS) {
+        dropPhyscialCards(item as PhysicalCardsDO, target);
+      } else {
+        dropTextCard(item as TextCardDO, target);
+      }
+      setSelectedCards([]);
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -52,18 +55,12 @@ const Playmat: FC = () => {
   useEffect(() => {
     const eventListener = (event: KeyboardEvent) => {
       if (event.key === 'Backspace' || event.key === 'Delete') {
-        const selectedCards = Array.from(document.querySelectorAll('[selected=true]'));
-        const selectedIds = selectedCards.map((el) => el.getAttribute('id'));
         const nextCardCollection = new CountedCollection(cardCollection);
         const nextCardStack = [...cardStack];
+        const physcialCardIds = selectedCards.map(card => card.id);
 
-        for (const selectedId of selectedIds) {
-          if (!selectedId) {
-            console.error("Card missing id property");
-            return;
-          }
-
-          const [,cardId,copy] = selectedId.split("_");
+        for (const physcialCardId of physcialCardIds) {
+          const [,cardId,copy] = physcialCardId.split("_");
           const stackIndex = nextCardStack.findIndex((stackCard) => 
             stackCard.card.id === cardId && 
             stackCard.copy === Number(copy));
@@ -80,17 +77,16 @@ const Playmat: FC = () => {
     return () => {
       document.removeEventListener('keydown', eventListener);
     };
-  }, [cardCollection, cardStack]);
+  }, [cardCollection, cardStack, selectedCards]);
 
-  const dropCard = (id: string, card: Card, target: DropTargetMonitor) => {
-    let playmatCard: PlaymatCard;
+  const dropPhyscialCards = (dragObject: PhysicalCardsDO, target: DropTargetMonitor) => {
     const nextCardStack = [...cardStack];
-    const offset = target.getSourceClientOffset();
+    const offset = target.getDifferenceFromInitialOffset();
     const offsetX = offset?.x ?? document.body.clientWidth / 2;
     const offsetY = offset?.y ?? document.body.clientHeight / 2;
 
-    if (id) {
-      const [,cardId,copy] = id.split("_");
+    for (const card of dragObject.cards) {
+      const [,cardId,copy] = card.id.split("_");
       const stackIndex = nextCardStack.findIndex((stackCard) => 
         stackCard.card.id === cardId && 
         stackCard.copy === Number(copy));
@@ -100,24 +96,35 @@ const Playmat: FC = () => {
         return;
       }
       
-      playmatCard = nextCardStack.splice(stackIndex, 1)[0];
-      playmatCard.left = offsetX;
-      playmatCard.top = offsetY;
-    } else {
-      const nextCardCollection = new CountedCollection(cardCollection);
-      nextCardCollection.addOne(card);
-      setCardCollection(nextCardCollection);
-      playmatCard = {
-        card: card,
-        copy: nextCardCollection.counts[card.id],
-        left: offsetX,
-        top: offsetY,
-      };
+      const playmatCard = nextCardStack.splice(stackIndex, 1)[0];
+      playmatCard.left += offsetX;
+      playmatCard.top += offsetY;
+      nextCardStack.push(playmatCard);
     }
 
-    nextCardStack.push(playmatCard);
     setCardStack(nextCardStack);
   };
+
+  const dropTextCard = (dragObject: TextCardDO, target: DropTargetMonitor) => {
+    const card = dragObject.card;
+    const offset = target.getSourceClientOffset();
+    const offsetX = offset?.x ?? document.body.clientWidth / 2;
+    const offsetY = offset?.y ?? document.body.clientHeight / 2;
+
+    const nextCardCollection = new CountedCollection(cardCollection);
+    nextCardCollection.addOne(card);
+    setCardCollection(nextCardCollection);
+
+    const nextCardStack = [...cardStack];
+    nextCardStack.push({
+      card: card,
+      copy: nextCardCollection.counts[card.id],
+      left: offsetX,
+      top: offsetY,
+    });
+
+    setCardStack(nextCardStack);
+  }
   
   const addCards = (adds: CountedCollection<Card>) => {
     const nextCardCollection = new CountedCollection(cardCollection);
@@ -142,12 +149,7 @@ const Playmat: FC = () => {
 
   const selectArea = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (dragSelectBoxProps.isDragging) {
-      const playmatElem = document.getElementById('playmat');
-      if (!playmatElem) {
-        console.error("Could not locate Playmat element");
-        return;
-      }
-
+      const nextSelectedCards = [];
       const originX = dragSelectBoxProps.originX;
       const originY = dragSelectBoxProps.originY;
       const mouseX = event.pageX;
@@ -155,43 +157,45 @@ const Playmat: FC = () => {
 
       for (const playmatCard of cardStack) {
         const {card, copy, left, top} = playmatCard;
-        const cardElem = playmatElem.querySelector(`#physical-card_${card.id}_${copy}`);
+        const selectedCard: SelectedCard = {
+          id: `physical-card_${card.id}_${copy}`,
+          image: card.image_uris?.png,
+          left: playmatCard.left,
+          top: playmatCard.top,
+        };
 
-        if (cardElem) {
-          const minY = top;
-          const minX = left;
-          const maxY = minY + 300; // card height
-          const maxX = minX + 214; // card width
+        const minY = top;
+        const minX = left;
+        const maxY = minY + 300; // card height
+        const maxX = minX + 214; // card width
 
-          const leftOrigin = minX > originX && originX < maxX
-          const centerXOrigin = minX < originX && originX < maxX
-          const rightOrigin = minX < originX && originX > maxX
-          const aboveOrigin = minY > originY && originY < maxY
-          const centerYOrigin = minY < originY && originY < maxY
-          const belowOrigin = minY < originY && originY > maxY
-          const leftMouse = minX > mouseX && mouseX < maxX
-          const rightMouse = minX < mouseX && mouseX > maxX
-          const aboveMouse = minY > mouseY && mouseY < maxY
-          const belowMouse = minY < mouseY && mouseY > maxY
+        const leftOrigin = minX > originX && originX < maxX
+        const centerXOrigin = minX < originX && originX < maxX
+        const rightOrigin = minX < originX && originX > maxX
+        const aboveOrigin = minY > originY && originY < maxY
+        const centerYOrigin = minY < originY && originY < maxY
+        const belowOrigin = minY < originY && originY > maxY
+        const leftMouse = minX > mouseX && mouseX < maxX
+        const rightMouse = minX < mouseX && mouseX > maxX
+        const aboveMouse = minY > mouseY && mouseY < maxY
+        const belowMouse = minY < mouseY && mouseY > maxY
 
-          // selection is based on where the mouse cannot be, given some point of origin
-          const selected = ((leftOrigin && aboveOrigin && !leftMouse && !aboveMouse) || // upper left
-            (leftOrigin && centerYOrigin && !leftMouse) || // left of center
-            (leftOrigin && belowOrigin && !leftMouse && !belowMouse) || // bottom left
-            (centerXOrigin && aboveOrigin && !aboveMouse) || // above center
-            (centerXOrigin && belowOrigin && !belowMouse) || // below center
-            (rightOrigin && aboveOrigin && !rightMouse && !aboveMouse) || // upper right
-            (rightOrigin && centerYOrigin && !rightMouse) || // right of center
-            (rightOrigin && belowOrigin && !rightMouse && !belowMouse)) // bottom right
+        // selection is based on where the mouse cannot be, given some point of origin
+        const selected = ((leftOrigin && aboveOrigin && !leftMouse && !aboveMouse) || // upper left
+          (leftOrigin && centerYOrigin && !leftMouse) || // left of center
+          (leftOrigin && belowOrigin && !leftMouse && !belowMouse) || // bottom left
+          (centerXOrigin && aboveOrigin && !aboveMouse) || // above center
+          (centerXOrigin && belowOrigin && !belowMouse) || // below center
+          (rightOrigin && aboveOrigin && !rightMouse && !aboveMouse) || // upper right
+          (rightOrigin && centerYOrigin && !rightMouse) || // right of center
+          (rightOrigin && belowOrigin && !rightMouse && !belowMouse)) // bottom right
           
-          if (selected) {
-            cardElem.setAttribute('selected', 'true');
-          } else {
-            cardElem.setAttribute('selected', 'false');
-          }
+        if (selected) {
+          nextSelectedCards.push(selectedCard);
         }
       }
 
+      setSelectedCards(nextSelectedCards);
       setDragSelectBoxProps({
         originX: 0,
         originY: 0,
@@ -202,7 +206,6 @@ const Playmat: FC = () => {
   }
 
   const physicalCards = useMemo(() => {
-    console.log('updating via ' + JSON.stringify(cardStack));
     return cardStack.map((playmatCard, index) => {
       const {card, copy, left, top} = playmatCard;
       const physicalCardId = `physical-card_${card.id}_${copy}`;
@@ -211,14 +214,15 @@ const Playmat: FC = () => {
           card={card}
           id={physicalCardId}
           key={physicalCardId}
-          position={{ left, top, zIndex: index  }}
-          onDoubleClick={() => {
-            // turn sideways or upright
-          }}>
+          position={{ left, top, zIndex: index + 2 }}
+          isDraggingCards={isDraggingCards}
+          setIsDraggingCards={setIsDraggingCards}
+          selectedCards={selectedCards}
+          setSelectedCards={setSelectedCards}>
         </PhysicalCard>
       );
     })
-  }, [cardStack]);
+  }, [cardStack, selectedCards, isDraggingCards]);
 
   return <>
     <Deckbox addPlaymatCards={addCards} />
@@ -232,7 +236,7 @@ const Playmat: FC = () => {
         originX: event.pageX,
         originY: event.pageY,
         isDragging: true,
-        zIndex: cardStack.length + 1,
+        zIndex: cardStack.length + 3,
       })}
     >
       <DragSelectBox {...dragSelectBoxProps} />

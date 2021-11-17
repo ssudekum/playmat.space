@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useEffect } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import './PhysicalCard.css';
 import Card from '../../lib/Card';
 import { Draggable } from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend';
+import { SelectedCard } from '../CustomDrag/CustomDragLayer';
 
 export type CardPosition = {
   top: number;
@@ -16,16 +17,34 @@ export type PhysicalCardProps = {
   id: string;
   card: Card;
   position: CardPosition;
-  onDoubleClick: DoubleClickFunction;
+  isDraggingCards: boolean;
+  setIsDraggingCards: (dragging: boolean) => void;
+  selectedCards: SelectedCard[];
+  setSelectedCards: (ids: SelectedCard[]) => void;
 };
 
-type DoubleClickFunction = {
-  (event: React.MouseEvent<HTMLImageElement, MouseEvent>): void
-};
+const PhysicalCard: React.FC<PhysicalCardProps> = ({
+  id, 
+  card, 
+  position, 
+  isDraggingCards, 
+  setIsDraggingCards, 
+  selectedCards, 
+  setSelectedCards
+}) => {
+  const selectedCard = useMemo(() => ({
+    id: id,
+    image: card.image_uris?.png,
+    left: position.left,
+    top: position.top,
+  }), [id, card, position]);
 
-const PhysicalCard: React.FC<PhysicalCardProps> = ({ id, card, position, onDoubleClick }) => {
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: Draggable.CARD, id: id, card: card },
+    item: {
+      type: Draggable.PHYSICAL_CARDS, 
+      cards: selectedCards,
+      anchor: selectedCard
+    },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -33,27 +52,45 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({ id, card, position, onDoubl
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true })
-  }, [preview])
+  }, [preview]);
 
-  const selectOnlyThis = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    event.currentTarget.setAttribute('selected', 'true');
-    const playmatElem = document.getElementById('playmat');
-    if (!playmatElem) {
-      console.error("Error: could not locate Playmat element");
-      return;
-    }
+  useEffect(() => {
+    setIsDraggingCards(isDragging);
+  }, [isDragging, setIsDraggingCards]);
 
-    let cardElements = playmatElem.getElementsByClassName('physical-card');
-    for (let [, cardElem] of Object.entries(cardElements)) {
-      if (cardElem &&
-        cardElem.getAttribute('id') !== id &&
-        cardElem.getAttribute('selected') === 'true') {
-        cardElem.setAttribute('selected', 'false')
+  const isSelected = useCallback(() => {
+    return !!selectedCards.find((selected) => 
+      selected.id === id
+    );
+  }, [id, selectedCards]);
+
+  const select = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (isSelected()) return;
+  
+    const nextSelectedCards = [...selectedCards];
+    nextSelectedCards.push(selectedCard);
+    setSelectedCards(nextSelectedCards);
+  };
+
+  const deselectOthers = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    setSelectedCards([selectedCard]);
+  };
+
+  const tapUntap = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+
+  };
+
+  const classNames = useMemo(() => {
+    const classNames = [];
+    if (isSelected()) {
+      classNames.push('selected');
+      if (isDraggingCards) {
+        classNames.push('hidden');
       }
     }
-
-    event.stopPropagation();
-  }
+    return classNames;
+  }, [isDraggingCards, isSelected]);
 
   return (
     <img
@@ -64,11 +101,12 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({ id, card, position, onDoubl
         left: `${position.left}px`,
         zIndex: position.zIndex
       }}
-      className={`physical-card ${isDragging ? 'hidden' : ''}`}
+      className={`physical-card ${classNames.join(' ')}`}
       alt={card.name}
       src={card.image_uris ? card.image_uris.png : ''}
-      onDoubleClick={onDoubleClick}
-      onMouseDown={selectOnlyThis}>
+      onDoubleClick={tapUntap}
+      onMouseDown={select}
+      onClick={deselectOthers}>
     </img>
   );
 }

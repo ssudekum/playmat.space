@@ -8,7 +8,7 @@
   background-repeat: no-repeat;
 }
 
-.physical-card[selected=true] {
+.selected {
   box-shadow: 0 0 5px 1px skyblue;
 }
 

@@ -13,7 +13,7 @@ type TextCardProps = {
 
 const TextCard: React.FC<TextCardProps> = ({ card }) => {
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: Draggable.CARD, id: null, card: card },
+    item: { type: Draggable.TEXT_CARD, card: card },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

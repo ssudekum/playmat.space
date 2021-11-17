@@ -1,12 +1,30 @@
-import React, {FC} from 'react'
-import { XYCoord, useDragLayer } from 'react-dnd'
-import { Draggable } from '../../lib/Draggable'
-import CardDragPreview from './CardDragPreview'
+import React, {CSSProperties, FC} from 'react'
+import { XYCoord, useDragLayer, DragObjectWithType } from 'react-dnd'
+import Card from '../../lib/Card';
+import { Draggable } from '../../lib/Draggable';
+import SingleCardDragPreview from './SingleCardDragPreview';
+import MultiCardDragPreview from './MultiCardDragPreview';
+
+export type SelectedCard = {
+  id: string;
+  image?: string;
+  left: number;
+  top: number;
+};
+
+export type PhysicalCardsDO = DragObjectWithType & {
+  cards: SelectedCard[]
+  anchor: SelectedCard
+};
+
+export type TextCardDO = DragObjectWithType & {
+  card: Card
+};
 
 const layerStyles: React.CSSProperties = {
   position: 'fixed',
   pointerEvents: 'none',
-  zIndex: 100,
+  zIndex: 998,
   left: 0,
   top: 0
 };
@@ -14,7 +32,7 @@ const layerStyles: React.CSSProperties = {
 const getItemStyles = (
   initialOffset: XYCoord | null,
   currentOffset: XYCoord | null
-) => {
+): CSSProperties => {
   if (!initialOffset || !currentOffset) {
     return {
       display: 'none'
@@ -46,8 +64,12 @@ export const CustomDragLayer: FC = () => {
 
   const renderItem = () => {
     switch (itemType) {
-      case Draggable.CARD:
-        return <CardDragPreview src={item.card.image_uris ? item.card.image_uris.png : ''} />
+      case Draggable.TEXT_CARD:
+        const textCardDO = item as TextCardDO;
+        return <SingleCardDragPreview src={textCardDO.card.image_uris ? textCardDO.card.image_uris.png : undefined} />
+      case Draggable.PHYSICAL_CARDS:
+        const physcialCardsDO = item as PhysicalCardsDO;
+        return <MultiCardDragPreview {...physcialCardsDO} />
       default:
         return null;
     }

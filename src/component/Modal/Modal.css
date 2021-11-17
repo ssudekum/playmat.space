@@ -11,7 +11,7 @@
   border: 3px outset grey;
   background-color: #49515f;
   box-shadow: 0px 0px 15px 3px black;
-  z-index: 100;
+  z-index: 1000;
   -webkit-animation-name: slideIn;
   -webkit-animation-duration: 0.3s;
   animation-name: slideIn;
@@ -32,7 +32,7 @@
 .mask {
   position: fixed;
   display: none;
-  z-index: 99;
+  z-index: 999;
   left: 0;
   top: 0;
   width: 100vw;
