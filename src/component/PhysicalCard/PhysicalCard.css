@@ -6,7 +6,6 @@
   background-image: url('../../image/mtg-card-back.png');
   background-size: cover;
   background-repeat: no-repeat;
-  z-index: 1;
 }
 
 .physical-card[selected=true] {
@@ -21,6 +20,5 @@
   background-image: url('../../image/mtg-card-back.png');
   background-size: cover;
   background-repeat: no-repeat;
-  z-index: 1;
   box-shadow: 0 0 5px 1px skyblue;
 }

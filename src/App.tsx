@@ -9,17 +9,20 @@ import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
 import SettingsButton from './component/Settings/SettingsButton';
 import Banner from './component/Banner/Banner';
 
-const App: FC = () => (
-  <div id="app" className="App">
-    <DndProvider backend={HTML5Backend}>
-      <Playmat />
-      <CustomDragLayer />
-    </DndProvider>
+const App: FC = () => {
+  console.log("page render");
+  return (
+    <div id="app" className="App">
+      <DndProvider backend={HTML5Backend}>
+        <Playmat />
+        <CustomDragLayer />
+      </DndProvider>
 
-    <Logo />
-    <Banner>Under Construction</Banner>
-    <SettingsButton />
-  </div>
-);
+      <Logo />
+      <Banner>Under Construction</Banner>
+      <SettingsButton />
+    </div>
+  );
+};
 
 export default App;

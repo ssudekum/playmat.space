@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {FC} from 'react'
 import { XYCoord, useDragLayer } from 'react-dnd'
 import { Draggable } from '../../lib/Draggable'
 import CardDragPreview from './CardDragPreview'
@@ -9,27 +9,27 @@ const layerStyles: React.CSSProperties = {
   zIndex: 100,
   left: 0,
   top: 0
-}
+};
 
-function getItemStyles(
+const getItemStyles = (
   initialOffset: XYCoord | null,
   currentOffset: XYCoord | null
-) {
+) => {
   if (!initialOffset || !currentOffset) {
     return {
       display: 'none'
-    }
+    };
   }
 
-  let { x, y } = currentOffset
-  const transform = `translate(${x}px, ${y}px)`
+  let { x, y } = currentOffset;
+  const transform = `translate(${x}px, ${y}px)`;
   return {
     transform,
     WebkitTransform: transform,
-  }
+  };
 }
 
-export const CustomDragLayer: React.FC = () => {
+export const CustomDragLayer: FC = () => {
   const {
     itemType,
     isDragging,
@@ -44,17 +44,17 @@ export const CustomDragLayer: React.FC = () => {
     isDragging: monitor.isDragging(),
   }))
 
-  function renderItem() {
+  const renderItem = () => {
     switch (itemType) {
       case Draggable.CARD:
         return <CardDragPreview src={item.card.image_uris ? item.card.image_uris.png : ''} />
       default:
-        return null
+        return null;
     }
   }
 
   if (!isDragging) {
-    return null
+    return null;
   }
   
   return (
@@ -63,5 +63,5 @@ export const CustomDragLayer: React.FC = () => {
         {renderItem()}
       </div>
     </div>
-  )
+  );
 }

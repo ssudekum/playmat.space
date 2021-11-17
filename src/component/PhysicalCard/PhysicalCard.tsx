@@ -62,7 +62,7 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({ id, card, position, onDoubl
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
-        zIndex: position.zIndex,
+        zIndex: position.zIndex
       }}
       className={`physical-card ${isDragging ? 'hidden' : ''}`}
       alt={card.name}

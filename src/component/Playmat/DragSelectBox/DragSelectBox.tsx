@@ -5,7 +5,7 @@ export type DragSelectBoxProps = {
   originX: number,
   originY: number,
   isDragging: boolean,
-  zIndex: number,
+  zIndex: number
 };
 
 export type DragSelectBoxStyle = {
@@ -14,7 +14,7 @@ export type DragSelectBoxStyle = {
   left: string,
   width: string,
   height: string,
-  zIndex: number,
+  zIndex: number
 };
 
 const emptyStyle: DragSelectBoxStyle = {
@@ -23,7 +23,7 @@ const emptyStyle: DragSelectBoxStyle = {
   left: '0px',
   width: '0px',
   height: '0px',
-  zIndex: 1,
+  zIndex: -1
 };
 
 export const DragSelectBox: React.FC<DragSelectBoxProps> = ({ originX, originY, isDragging, zIndex }) => {
@@ -48,7 +48,7 @@ export const DragSelectBox: React.FC<DragSelectBoxProps> = ({ originX, originY, 
           left: `${originX}px`,
           width: `${differenceX}px`,
           height: `${differenceY}px`,
-          zIndex: zIndex
+          zIndex: zIndex,
         }
 
         if (differenceX < 0) {
