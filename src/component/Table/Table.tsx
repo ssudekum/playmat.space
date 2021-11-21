@@ -19,25 +19,37 @@ export type TableProps = {
   initialSortField?: string;
 };
 
-const naturalSort = (direction: SortDirection): Comparator => {
+const naturalSort = (sortBy: string, direction: SortDirection): Comparator => {
   return direction === "desc"
-    ? (a, b) => a === b ? 0 : a > b ? -1 : 1
-    : (a, b) => a === b ? 0 : a < b ? -1 : 1;
+    ? (a, b) => { 
+      const valueA = a[sortBy];
+      const valueB = b[sortBy];
+      return valueA === valueB ? 0 : valueA > valueB ? -1 : 1
+    }
+    : (a, b) => {
+      const valueA = a[sortBy];
+      const valueB = b[sortBy];
+      return valueA === valueB ? 0 : valueA < valueB ? -1 : 1
+    };
 };
 
 const SortableTable: FC<TableProps> = (props) => {
   const { columns, rows, initialSortField } = props;
   const [sortBy, setSortBy] = useState(initialSortField ?? columns[0]?.field);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const tableRows = useMemo(() => {
     if (rows?.length) {
       const column = columns?.find(column => column.field === sortBy);
+      console.log(sortBy);
+      console.log(sortDirection);
       const comparator = column?.getComparator
         ? column.getComparator(sortDirection)
-        : naturalSort(sortDirection);
+        : naturalSort(sortBy, sortDirection);
       
       rows.sort(comparator);
+      console.log(comparator);
+      console.log(rows);
       return rows.map((row: Record<string, any>, idx: number) => (
         <TableRow key={idx}>
           {

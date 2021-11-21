@@ -41,7 +41,8 @@ const Decklist: FC<TableProps> = ({ cards }) => {
   return (
     <Table 
       columns={columns} 
-      rows={cards.items}>
+      rows={cards.items}
+      initialSortField="name">
       No cards in this list!
     </Table>
   );

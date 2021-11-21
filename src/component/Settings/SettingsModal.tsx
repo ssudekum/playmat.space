@@ -1,4 +1,5 @@
 import React, {FC} from 'react';
+import { Modal } from '../Modal/Modal';
 
 export type SettingsModalProps = {
   visible: boolean,
@@ -6,9 +7,7 @@ export type SettingsModalProps = {
 }
 
 const SettingsModal: FC<SettingsModalProps> = ({ visible, setVisible }) => (
-  <div className={`settingsModal ${visible ? '' : 'hidden'}`}>
-    <i className="fas fa-times close" onClick={() => setVisible(false)}></i>
-  </div>
+  <Modal visible={visible} setVisible={setVisible}></Modal>
 );
 
 export default SettingsModal;
