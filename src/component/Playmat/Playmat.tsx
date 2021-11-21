@@ -8,14 +8,18 @@ import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox
 import playmatImage from '../../image/goyf-playmat.jpg'
 import CountedCollection from '../../lib/CountedCollection';
 import Deckbox from './Deckbox/Deckbox';
-import { PhysicalCardsDO, SelectedCard, TextCardDO } from '../CustomDrag/CustomDragLayer'
+import { PhysicalCardsDO, TextCardDO } from '../CustomDrag/CustomDragLayer'
 
 export type PlaymatCard = {
   card: Card;
   copy: number;
   left: number;
   top: number;
+  isTapped: boolean;
 };
+
+export const cardEquals = (a: PlaymatCard, b: PlaymatCard) => 
+  a.card.id === b.card.id && a.copy === b.copy;
 
 let playmatStyle = {};
 if (playmatImage) {
@@ -27,7 +31,7 @@ if (playmatImage) {
 const Playmat: FC = () => {
   const [cardStack, setCardStack] = useState<PlaymatCard[]>([]);
   const [cardCollection, setCardCollection] = useState(new CountedCollection<Card>());
-  const [selectedCards, setSelectedCards] = useState<SelectedCard[]>([]);
+  const [selectedCards, setSelectedCards] = useState<PlaymatCard[]>([]);
   const [isDraggingCards, setIsDraggingCards] = useState(false);
   const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({
     originX: 0,
@@ -44,7 +48,6 @@ const Playmat: FC = () => {
       } else {
         dropTextCard(item as TextCardDO, target);
       }
-      setSelectedCards([]);
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
@@ -57,15 +60,11 @@ const Playmat: FC = () => {
       if (event.key === 'Backspace' || event.key === 'Delete') {
         const nextCardCollection = new CountedCollection(cardCollection);
         const nextCardStack = [...cardStack];
-        const physcialCardIds = selectedCards.map(card => card.id);
 
-        for (const physcialCardId of physcialCardIds) {
-          const [,cardId,copy] = physcialCardId.split("_");
-          const stackIndex = nextCardStack.findIndex((stackCard) => 
-            stackCard.card.id === cardId && 
-            stackCard.copy === Number(copy));
-          const playmatCard = nextCardStack.splice(stackIndex, 1)[0];
-          nextCardCollection.subtractOne(playmatCard.card)
+        for (const selected of selectedCards) {
+          const stackIndex = nextCardStack.findIndex((stack) => cardEquals(stack, selected));
+          const stackCard = nextCardStack.splice(stackIndex, 1)[0];
+          nextCardCollection.subtractOne(stackCard.card)
         }
 
         setCardCollection(nextCardCollection);
@@ -81,25 +80,26 @@ const Playmat: FC = () => {
 
   const dropPhyscialCards = (dragObject: PhysicalCardsDO, target: DropTargetMonitor) => {
     const nextCardStack = [...cardStack];
+    const nextSelectedCards = [...selectedCards];
     const offset = target.getDifferenceFromInitialOffset();
     const offsetX = offset?.x ?? document.body.clientWidth / 2;
     const offsetY = offset?.y ?? document.body.clientHeight / 2;
 
-    for (const card of dragObject.cards) {
-      const [,cardId,copy] = card.id.split("_");
-      const stackIndex = nextCardStack.findIndex((stackCard) => 
-        stackCard.card.id === cardId && 
-        stackCard.copy === Number(copy));
-      
+    for (const dropped of dragObject.selectedCards) {
+      const stackIndex = nextCardStack.findIndex((stack) => cardEquals(stack, dropped));
       if (stackIndex === -1) {
-        console.error(`Card {id: ${cardId}, copy: ${copy}} is missing from stack`);
-        return;
+        throw Error(`Card {id: ${dropped.card.id}, copy: ${dropped.copy}} is missing from stack`);
       }
       
-      const playmatCard = nextCardStack.splice(stackIndex, 1)[0];
-      playmatCard.left += offsetX;
-      playmatCard.top += offsetY;
-      nextCardStack.push(playmatCard);
+      const stackCard = nextCardStack.splice(stackIndex, 1)[0];
+      stackCard.left += offsetX;
+      stackCard.top += offsetY;
+      nextCardStack.push(stackCard);
+      
+      const selectedCard = nextSelectedCards.find((selected) => cardEquals(selected, dropped));
+      if (!selectedCard) throw Error('Dropped card was not selected');
+      selectedCard.left = stackCard.left;
+      selectedCard.top = stackCard.top;
     }
 
     setCardStack(nextCardStack);
@@ -121,6 +121,7 @@ const Playmat: FC = () => {
       copy: nextCardCollection.counts[card.id],
       left: offsetX,
       top: offsetY,
+      isTapped: false
     });
 
     setCardStack(nextCardStack);
@@ -138,7 +139,8 @@ const Playmat: FC = () => {
           card: card,
           left: document.body.clientWidth / 2,
           top: document.body.clientHeight / 2,
-          copy: nextCardCollection.counts[card.id]
+          copy: nextCardCollection.counts[card.id],
+          isTapped: false,
         });
       }
     }
@@ -156,14 +158,7 @@ const Playmat: FC = () => {
       const mouseY = event.pageY;
 
       for (const playmatCard of cardStack) {
-        const {card, copy, left, top} = playmatCard;
-        const selectedCard: SelectedCard = {
-          id: `physical-card_${card.id}_${copy}`,
-          image: card.image_uris?.png,
-          left: playmatCard.left,
-          top: playmatCard.top,
-        };
-
+        const {left, top} = playmatCard;
         const minY = top;
         const minX = left;
         const maxY = minY + 300; // card height
@@ -191,7 +186,7 @@ const Playmat: FC = () => {
           (rightOrigin && belowOrigin && !rightMouse && !belowMouse)) // bottom right
           
         if (selected) {
-          nextSelectedCards.push(selectedCard);
+          nextSelectedCards.push(playmatCard);
         }
       }
 
@@ -203,25 +198,20 @@ const Playmat: FC = () => {
         zIndex: -1
       });
     }
-  }
+  };
 
   const physicalCards = useMemo(() => {
-    return cardStack.map((playmatCard, index) => {
-      const {card, copy, left, top} = playmatCard;
-      const physicalCardId = `physical-card_${card.id}_${copy}`;
-      return (
-        <PhysicalCard
-          card={card}
-          id={physicalCardId}
-          key={physicalCardId}
-          position={{ left, top, zIndex: index + 2 }}
-          isDraggingCards={isDraggingCards}
-          setIsDraggingCards={setIsDraggingCards}
-          selectedCards={selectedCards}
-          setSelectedCards={setSelectedCards}>
-        </PhysicalCard>
-      );
-    })
+    return cardStack.map((playmatCard, index) => (
+      <PhysicalCard
+        key={index}
+        zIndex={index + 2}
+        playmatCard={playmatCard}
+        isDraggingCards={isDraggingCards}
+        setIsDraggingCards={setIsDraggingCards}
+        selectedCards={selectedCards}
+        setSelectedCards={setSelectedCards}>
+      </PhysicalCard>
+    ))
   }, [cardStack, selectedCards, isDraggingCards]);
 
   return <>

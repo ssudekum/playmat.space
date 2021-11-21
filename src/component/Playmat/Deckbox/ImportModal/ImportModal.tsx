@@ -80,8 +80,16 @@ export const ImportModal: FC<ImportModalProps> = ({ visible, setVisible, onImpor
 
   return (
     <Modal id="importModal" visible={visible} setVisible={setVisible}>
-      <textarea id="importData"></textarea>
-      <button id="importButton" className="button" onClick={doImport} disabled={isLoading}>Import</button>
+      <textarea id="importData" />
+      <button 
+        id="importButton"
+        className="button"
+        onClick={doImport}
+        disabled={isLoading}>
+        {isLoading ? <>
+          <i className="fa fa-spinner fa-spin" /> Working
+        </>: 'Import'}
+      </button>
     </Modal>
   );
 }

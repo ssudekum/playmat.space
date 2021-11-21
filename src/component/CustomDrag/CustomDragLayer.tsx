@@ -4,17 +4,11 @@ import Card from '../../lib/Card';
 import { Draggable } from '../../lib/Draggable';
 import SingleCardDragPreview from './SingleCardDragPreview';
 import MultiCardDragPreview from './MultiCardDragPreview';
-
-export type SelectedCard = {
-  id: string;
-  image?: string;
-  left: number;
-  top: number;
-};
+import { PlaymatCard } from '../Playmat/Playmat';
 
 export type PhysicalCardsDO = DragObjectWithType & {
-  cards: SelectedCard[]
-  anchor: SelectedCard
+  selectedCards: PlaymatCard[]
+  anchor: PlaymatCard
 };
 
 export type TextCardDO = DragObjectWithType & {
@@ -26,7 +20,7 @@ const layerStyles: React.CSSProperties = {
   pointerEvents: 'none',
   zIndex: 998,
   left: 0,
-  top: 0
+  top: 0,
 };
 
 const getItemStyles = (
@@ -60,13 +54,13 @@ export const CustomDragLayer: FC = () => {
     initialOffset: monitor.getInitialSourceClientOffset(),
     currentOffset: monitor.getSourceClientOffset(),
     isDragging: monitor.isDragging(),
-  }))
+  }));
 
   const renderItem = () => {
     switch (itemType) {
       case Draggable.TEXT_CARD:
         const textCardDO = item as TextCardDO;
-        return <SingleCardDragPreview src={textCardDO.card.image_uris ? textCardDO.card.image_uris.png : undefined} />
+        return <SingleCardDragPreview src={textCardDO.card.image_uris ? textCardDO.card.image_uris.normal : undefined} />
       case Draggable.PHYSICAL_CARDS:
         const physcialCardsDO = item as PhysicalCardsDO;
         return <MultiCardDragPreview {...physcialCardsDO} />

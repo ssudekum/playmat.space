@@ -6,7 +6,6 @@
   background-image: url('../../image/mtg-card-back.png');
   background-size: cover;
   background-repeat: no-repeat;
-  transition: transform 0.1s linear;
 }
 
 .physical-card-preview {
@@ -26,4 +25,8 @@
 
 .tapped {
   transform: rotate(90deg);
+}
+
+.animate {
+  transition: transform 0.1s linear;
 }

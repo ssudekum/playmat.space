@@ -7,12 +7,12 @@ import CardSearch from './CardSearch/CardSearch';
 import './Deckbox.css'
 
 type DeckboxProps = {
-  addPlaymatCards: (cards: CountedCollection<Card>) => void 
+  addPlaymatCards: (cards: CountedCollection<Card>) => void
 };
 
 const Deckbox: FC<DeckboxProps> = ({ addPlaymatCards }) => {
   const [isDeckboxVisible, setIsDeckboxVisible] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [cards, setCards] = useState<CountedCollection<Card>>(new CountedCollection());
 
   const onSelect = (card: Card) => {

@@ -23,7 +23,7 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview]);
 
-  const image = card.image_uris ? card.image_uris.png : "";
+  const image = card.image_uris ? card.image_uris.normal : "";
   
   const tooltip = () => (
     createPortal(

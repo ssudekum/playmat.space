@@ -1,51 +1,41 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useEffect } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import './PhysicalCard.css';
-import Card from '../../lib/Card';
 import { Draggable } from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { SelectedCard } from '../CustomDrag/CustomDragLayer';
-
-export type CardPosition = {
-  top: number;
-  left: number;
-  zIndex: number;
-};
+import { cardEquals, PlaymatCard } from '../Playmat/Playmat';
+import cardBack from '../../image/mtg-card-back.png';
 
 export type PhysicalCardProps = {
-  id: string;
-  card: Card;
-  position: CardPosition;
+  zIndex: number;
+  playmatCard: PlaymatCard;
   isDraggingCards: boolean;
   setIsDraggingCards: (dragging: boolean) => void;
-  selectedCards: SelectedCard[];
-  setSelectedCards: (ids: SelectedCard[]) => void;
+  selectedCards: PlaymatCard[];
+  setSelectedCards: (ids: PlaymatCard[]) => void;
 };
 
 const PhysicalCard: React.FC<PhysicalCardProps> = ({
-  id, 
-  card, 
-  position, 
+  zIndex,
+  playmatCard,
   isDraggingCards, 
   setIsDraggingCards, 
   selectedCards, 
   setSelectedCards
 }) => {
-  const [isTapped, setIsTapped] = useState(false);
+  const id = `physical-card_${playmatCard.card.id}_${playmatCard.copy}`;
 
-  const selectedCard = useMemo(() => ({
-    id: id,
-    image: card.image_uris?.png,
-    left: position.left,
-    top: position.top,
-  }), [id, card, position]);
+  const isSelected = useMemo(() => (
+    !!selectedCards.find((selected) => 
+      cardEquals(selected, playmatCard))
+  ), [selectedCards, playmatCard]);
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: {
       type: Draggable.PHYSICAL_CARDS, 
-      cards: selectedCards,
-      anchor: selectedCard
+      selectedCards: selectedCards,
+      anchor: playmatCard
     },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
@@ -60,48 +50,47 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     setIsDraggingCards(isDragging);
   }, [isDragging, setIsDraggingCards]);
 
-  const isSelected = useCallback(() => {
-    return !!selectedCards.find((selected) => 
-      selected.id === id
-    );
-  }, [id, selectedCards]);
-
   const select = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
     event.stopPropagation();
-    if (isSelected()) return;
-    const nextSelectedCards = [selectedCard];
+    if (isSelected) return;
+    const nextSelectedCards = [playmatCard];
     setSelectedCards(nextSelectedCards);
   };
 
-  const classNames = useMemo(() => {
-    const classNames = [];
-    if (isSelected()) {
-      classNames.push('selected');
-      if (isDraggingCards) {
-        classNames.push('hidden');
-      }
+  const tapUntapAction = () => {
+    const isTapped = !playmatCard.isTapped;
+    let nextSelectedCards = [...selectedCards];
+    nextSelectedCards = nextSelectedCards.map((selectedCard) => {
+      selectedCard.isTapped = isTapped;
+      return selectedCard;
+    });
+    setSelectedCards(nextSelectedCards);
+  };
+
+  const classNames = [];
+  if (isSelected) {
+    classNames.push('selected');
+    if (isDraggingCards) {
+      classNames.push('hidden');
     }
-
-    if (isTapped) {
-      classNames.push('tapped');
-    }
-
-    return classNames;
-  }, [isDraggingCards, isSelected, isTapped]);
-
+  }
+  if (playmatCard.isTapped) {
+    classNames.push('tapped');
+  }
+  
   return (
     <img
       id={id}
       ref={drag}
       style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-        zIndex: position.zIndex
+        top: `${playmatCard.top}px`,
+        left: `${playmatCard.left}px`,
+        zIndex: zIndex,
       }}
       className={`physical-card ${classNames.join(' ')}`}
-      alt={card.name}
-      src={card.image_uris ? card.image_uris.png : ''}
-      onDoubleClick={() => setIsTapped(tapped => !tapped)}
+      alt={playmatCard.card.name}
+      src={playmatCard.card.image_uris?.normal ?? cardBack}
+      onDoubleClick={tapUntapAction}
       onMouseDown={select}>
     </img>
   );
