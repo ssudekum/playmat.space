@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import Draggable from '../../lib/Draggable';
@@ -9,29 +9,28 @@ import './PhysicalCard.css';
 export type PhysicalCardProps = {
   zIndex: number;
   playmatCard: PlaymatCard;
-  isDraggingCards: boolean;
-  setIsDraggingCards: (dragging: boolean) => void;
   selectedCards: PlaymatCard[];
   setSelectedCards: (cards: PlaymatCard[]) => void;
-  addCopies: (cards: PlaymatCard[]) => void
+  isDraggingSelection: boolean;
+  setIsDraggingSelection: (isDraggingSelection: boolean) => void;
+  isAnimated: boolean;
+  animate: () => void;
+  addCopies: (cards: PlaymatCard[]) => void;
 };
 
 const PhysicalCard: React.FC<PhysicalCardProps> = ({
   zIndex,
   playmatCard,
-  isDraggingCards, 
-  setIsDraggingCards, 
   selectedCards, 
   setSelectedCards,
+  isDraggingSelection,
+  setIsDraggingSelection,
+  isAnimated,
+  animate,
   addCopies
 }) => {
   const id = `physical-card_${playmatCard.card.id}_${playmatCard.copy}`;
   const cardRef = useRef(null);
-
-  const isSelected = useMemo(() => (
-    !!selectedCards.find((selected) => 
-      cardEquals(selected, playmatCard))
-  ), [selectedCards, playmatCard]);
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: {
@@ -49,8 +48,13 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   }, [preview]);
 
   useEffect(() => {
-    setIsDraggingCards(isDragging);
-  }, [isDragging, setIsDraggingCards]);
+    setIsDraggingSelection(isDragging);
+  }, [isDragging, setIsDraggingSelection]);
+
+  const isSelected = useMemo(() => (
+    !!selectedCards.find((selected) => 
+      cardEquals(selected, playmatCard))
+  ), [selectedCards, playmatCard]);
 
   const select = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
     event.stopPropagation();
@@ -66,6 +70,7 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
       selectedCard.isTapped = isTapped;
       return selectedCard;
     });
+    animate();
     setSelectedCards(nextSelectedCards);
   };
 
@@ -82,68 +87,52 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   const classNames = [];
   if (isSelected) {
     classNames.push('selected');
-    if (isDraggingCards) {
+    if (isDraggingSelection) {
       classNames.push('hidden');
     }
+  }
+  if (isAnimated) {
+    classNames.push('animated');
   }
   if (playmatCard.isTapped) {
     classNames.push('tapped');
   }
+
+  const options = [
+    {
+      display: 'Flip',
+      onClick: flip
+    },{
+      display: 'Clone',
+      onClick: () => addCopies(selectedCards)
+    },{
+      display: 'Add Counter',
+      onClick: () => {}
+    },{
+      display: 'Move to',
+      options: [{
+        display: 'Graveyard',
+        onClick: () => {}
+      },{
+        display: 'Exile',
+        onClick: () => {}
+      },{
+        display: 'Top of library',
+        onClick: () => {}
+      },{
+        display: 'X cards from the top of library',
+        onClick: () => {}
+      },{
+        display: 'Bottom of library',
+        onClick: () => {}
+      }]
+    }
+  ];
   
   return (<>
     <ContextMenu 
       target={cardRef}
-      options={[
-        {
-          display: 'Flip',
-          onClick: flip
-        },
-        {
-          display: 'Clone',
-          onClick: () => addCopies(selectedCards)
-        },
-        {
-          display: 'Add Counter',
-          onClick: () => {
-
-          }
-        },
-        {
-          display: 'Move to',
-          options: [
-            {
-              display: 'Graveyard',
-              onClick: () => {
-    
-              }
-            },
-            {
-              display: 'Exile',
-              onClick: () => {
-    
-              }
-            },
-            {
-              display: 'Top of library',
-              onClick: () => {
-    
-              }
-            },
-            {
-              display: 'X cards from the top of library',
-              onClick: () => {
-    
-              }
-            },
-            {
-              display: 'Bottom of library',
-              onClick: () => {
-    
-              }
-            },
-          ]
-        }
-      ]}
+      options={options}
     />
     <span 
       ref={cardRef}

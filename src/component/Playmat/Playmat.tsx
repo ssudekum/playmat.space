@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useMemo } from 'react'
+import React, { FC, useState, useEffect, useMemo, useCallback } from 'react'
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import Card from '../../lib/Card';
 import PlaymatCard, { cardEquals } from '../../lib/PlaymatCard';
@@ -22,7 +22,8 @@ const Playmat: FC = () => {
   const [cardStack, setCardStack] = useState<PlaymatCard[]>([]);
   const [cardCollection, setCardCollection] = useState(new CountedCollection<Card>());
   const [selectedCards, setSelectedCards] = useState<PlaymatCard[]>([]);
-  const [isDraggingCards, setIsDraggingCards] = useState(false);
+  const [isDraggingSelection, setIsDraggingSelection] = useState(false);
+  const [isAnimatingCards, setIsAnimatingCards] = useState(false);
   const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({
     originX: 0,
     originY: 0,
@@ -116,25 +117,6 @@ const Playmat: FC = () => {
     setCardStack(nextCardStack);
   }
 
-  const addCopies = (cards: PlaymatCard[]) => {
-    const nextCardCollection = new CountedCollection(cardCollection);
-    const nextCardStack = [...cardStack];
-
-    for (const playmatCard of cards) {
-      const card = playmatCard.card;
-      nextCardCollection.addOne(card);
-      nextCardStack.push({
-        ...playmatCard,
-        top: playmatCard.top + 25,
-        left: playmatCard.left + 25,
-        copy: nextCardCollection.counts[card.id]
-      });
-    }
-
-    setCardCollection(nextCardCollection);
-    setCardStack(nextCardStack);
-  };
-
   const addCollection = (adds: CountedCollection<Card>) => {
     const nextCardCollection = new CountedCollection(cardCollection);
     const nextCardStack = [...cardStack];
@@ -207,20 +189,49 @@ const Playmat: FC = () => {
     }
   };
 
+    const addCopies = useCallback((cards: PlaymatCard[]) => {
+    const nextCardCollection = new CountedCollection(cardCollection);
+    const nextCardStack = [...cardStack];
+
+    for (const playmatCard of cards) {
+      const card = playmatCard.card;
+      nextCardCollection.addOne(card);
+      nextCardStack.push({
+        ...playmatCard,
+        top: playmatCard.top + 25,
+        left: playmatCard.left + 25,
+        copy: nextCardCollection.counts[card.id]
+      });
+    }
+
+    setCardCollection(nextCardCollection);
+    setCardStack(nextCardStack);
+  }, [cardCollection, cardStack]);
+
+  const animate = () => {
+    setIsAnimatingCards(true);
+    setTimeout(() => {
+      setIsAnimatingCards(false);
+    }, 200);
+  };
+
   const physicalCards = useMemo(() => {
+    console.log('rendering cards');
     return cardStack.map((playmatCard, index) => (
       <PhysicalCard
         key={index}
         zIndex={index + 2}
         playmatCard={playmatCard}
-        isDraggingCards={isDraggingCards}
-        setIsDraggingCards={setIsDraggingCards}
+        isDraggingSelection={isDraggingSelection}
+        setIsDraggingSelection={setIsDraggingSelection}
         selectedCards={selectedCards}
         setSelectedCards={setSelectedCards}
+        animate={animate}
+        isAnimated={isAnimatingCards}
         addCopies={addCopies}>
       </PhysicalCard>
     ))
-  }, [cardStack, selectedCards, isDraggingCards]);
+  }, [cardStack, selectedCards, isDraggingSelection, isAnimatingCards, addCopies]);
 
   return <>
     <Deckbox addCollection={addCollection} />

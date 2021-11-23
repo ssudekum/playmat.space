@@ -27,6 +27,6 @@
   transform: rotate(90deg);
 }
 
-.animate {
+.animated {
   transition: transform 0.1s linear;
 }
