@@ -1,6 +1,6 @@
 import Card, {getCardImage as getImage} from "./Card";
 
-type PlaymatCard = {
+type PhysicalCard = {
   card: Card;
   copy: number;
   left: number;
@@ -9,10 +9,10 @@ type PlaymatCard = {
   isFlipped?: boolean;
 };
 
-export const cardEquals = (a: PlaymatCard, b: PlaymatCard) => 
+export const cardEquals = (a: PhysicalCard, b: PhysicalCard) => 
   a.card.id === b.card.id && a.copy === b.copy;
 
-export const getCardImage = (playmatCard: PlaymatCard) =>
+export const getCardImage = (playmatCard: PhysicalCard) =>
   getImage(playmatCard.card, playmatCard.isFlipped);
 
-export default PlaymatCard;
+export default PhysicalCard;

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import './CardSearch.css'
-import Card from '../../../../lib/Card';
+import Card from '../../../lib/Card';
 
 const CardSearch: React.FC<{ onSelect: Function }> = props => {
   const [token, setToken] = useState(() => () => { });

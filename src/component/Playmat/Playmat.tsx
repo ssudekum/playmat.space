@@ -1,15 +1,17 @@
-import React, { FC, useState, useEffect, useMemo, useCallback } from 'react'
+import React, { FC, useState, useEffect, useMemo } from 'react'
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import Card from '../../lib/Card';
-import PlaymatCard, { cardEquals } from '../../lib/PlaymatCard';
+import PhysicalCard, { cardEquals } from '../../lib/PhysicalCard';
 import './Playmat.css'
 import Draggable from '../../lib/Draggable'
-import PhysicalCard from '../PhysicalCard/PhysicalCard'
+import PlaymatCard from '../PlaymatCard/PlaymatCard'
 import DragSelectBox, { DragSelectBoxProps } from './DragSelectBox/DragSelectBox';
 import playmatImage from '../../image/goyf-playmat.jpg'
 import CountedCollection from '../../lib/CountedCollection';
-import Deckbox from './Deckbox/Deckbox';
-import { PhysicalCardsDO, TextCardDO } from '../CustomDrag/CustomDragLayer'
+import Deckbox from '../Deckbox/Deckbox';
+import { PhysicalCardsDO, TextCardDO } from '../CustomDrag/CustomDragLayer';
+import ContextMenu from '../ContextMenu/ContextMenu';
+import ContextOption from '../ContextMenu/ContextOption';
 
 let playmatStyle = {};
 if (playmatImage) {
@@ -19,9 +21,9 @@ if (playmatImage) {
 }
 
 const Playmat: FC = () => {
-  const [cardStack, setCardStack] = useState<PlaymatCard[]>([]);
+  const [cardStack, setCardStack] = useState<PhysicalCard[]>([]);
   const [cardCollection, setCardCollection] = useState(new CountedCollection<Card>());
-  const [selectedCards, setSelectedCards] = useState<PlaymatCard[]>([]);
+  const [selectedCards, setSelectedCards] = useState<PhysicalCard[]>([]);
   const [isDraggingSelection, setIsDraggingSelection] = useState(false);
   const [isAnimatingCards, setIsAnimatingCards] = useState(false);
   const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({
@@ -189,25 +191,6 @@ const Playmat: FC = () => {
     }
   };
 
-    const addCopies = useCallback((cards: PlaymatCard[]) => {
-    const nextCardCollection = new CountedCollection(cardCollection);
-    const nextCardStack = [...cardStack];
-
-    for (const playmatCard of cards) {
-      const card = playmatCard.card;
-      nextCardCollection.addOne(card);
-      nextCardStack.push({
-        ...playmatCard,
-        top: playmatCard.top + 25,
-        left: playmatCard.left + 25,
-        copy: nextCardCollection.counts[card.id]
-      });
-    }
-
-    setCardCollection(nextCardCollection);
-    setCardStack(nextCardStack);
-  }, [cardCollection, cardStack]);
-
   const animate = () => {
     setIsAnimatingCards(true);
     setTimeout(() => {
@@ -218,7 +201,7 @@ const Playmat: FC = () => {
   const physicalCards = useMemo(() => {
     console.log('rendering cards');
     return cardStack.map((playmatCard, index) => (
-      <PhysicalCard
+      <PlaymatCard
         key={index}
         zIndex={index + 2}
         playmatCard={playmatCard}
@@ -227,18 +210,46 @@ const Playmat: FC = () => {
         selectedCards={selectedCards}
         setSelectedCards={setSelectedCards}
         animate={animate}
-        isAnimated={isAnimatingCards}
-        addCopies={addCopies}>
-      </PhysicalCard>
+        isAnimated={isAnimatingCards}>
+      </PlaymatCard>
     ))
-  }, [cardStack, selectedCards, isDraggingSelection, isAnimatingCards, addCopies]);
+  }, [cardStack, selectedCards, isDraggingSelection, isAnimatingCards]);
+
+  const flipSelected = () => {
+    console.log(selectedCards);
+    let nextSelectedCards = [...selectedCards];
+    nextSelectedCards = nextSelectedCards.map((selectedCard) => {
+      selectedCard.isFlipped = !selectedCard.isFlipped;
+      return selectedCard;
+    });
+    setSelectedCards(nextSelectedCards);
+  };
+
+  const cloneSelected = () => {
+    const nextCardCollection = new CountedCollection(cardCollection);
+    const nextCardStack = [...cardStack];
+
+    for (const physicalCard of selectedCards) {
+      const card = physicalCard.card;
+      nextCardCollection.addOne(card);
+      nextCardStack.push({
+        ...physicalCard,
+        top: physicalCard.top + 25,
+        left: physicalCard.left + 25,
+        copy: nextCardCollection.counts[card.id]
+      });
+    }
+
+    setCardCollection(nextCardCollection);
+    setCardStack(nextCardStack);
+  };
 
   return <>
     <Deckbox addCollection={addCollection} />
-    <div 
-      ref={drop} 
-      id="playmat" 
-      className="playmat" 
+    <div
+      ref={drop}
+      id="playmat"
+      className="playmat"
       style={playmatStyle}
       onMouseUp={selectArea}
       onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -253,6 +264,14 @@ const Playmat: FC = () => {
       }}
     >
       <DragSelectBox {...dragSelectBoxProps} />
+      <ContextMenu id="playmat-menu">
+        <ContextOption label="Flip" onClick={flipSelected} />
+        <ContextOption label="Clone" onClick={cloneSelected} />
+        <ContextOption label="Move to">
+          <ContextOption label="Graveyard" onClick={cloneSelected} />
+          <ContextOption label="Exile" onClick={cloneSelected} />
+        </ContextOption>
+      </ContextMenu>
       {physicalCards}
     </div>
   </>;

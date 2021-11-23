@@ -1,4 +1,4 @@
-.physical-card {
+.playmat-card {
   height: 300px;
   border-radius: 15px;
   position: absolute;
@@ -8,7 +8,7 @@
   background-repeat: no-repeat;
 }
 
-.physical-card-preview {
+.playmat-card-preview {
   height: 300px;
   border-radius: 15px;
   position: absolute;

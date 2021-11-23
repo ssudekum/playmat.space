@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react'
-import Card from '../../../lib/Card';
-import CountedCollection from '../../../lib/CountedCollection';
+import Card from '../../lib/Card';
+import CountedCollection from '../../lib/CountedCollection';
 import Decklist from './Decklist/Decklist';
 import ImportModal from './ImportModal/ImportModal';
 import CardSearch from './CardSearch/CardSearch';

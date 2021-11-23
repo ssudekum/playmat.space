@@ -1,14 +1,16 @@
-import React, { FC, useRef, useState } from "react";
-import { ContextMenuOption } from "./ContextMenu";
+import React, { FC, useContext, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { hideMenus } from "../../redux/actions";
+import { MenuContext } from './ContextMenu';
 import SubContextMenu from './SubContextMenu';
 
 export type ContextOptionProps = {
-  option: ContextMenuOption;
-  setIsVisible: (visible: boolean) => void;
-};
+  label: string;
+  onClick?: () => void
+}
 
-const ContextOption: FC<ContextOptionProps> = ({option, setIsVisible}) => {
-  const {display, onClick, options} = option;
+const ContextOption: FC<ContextOptionProps> = ({label, onClick, children}) => {
+  const dispatch = useDispatch();
   const optionRef = useRef<HTMLDivElement>(null);
   const [subContextIsVisible, setSubContextIsVisible] = useState(false);
 
@@ -17,10 +19,10 @@ const ContextOption: FC<ContextOptionProps> = ({option, setIsVisible}) => {
     if (onClick) {
       onClick();
     }
-    setIsVisible(false);
+    dispatch(hideMenus());
   };
 
-  return (<>
+  return (
     <div 
       ref={optionRef}
       className="contextMenuOption" 
@@ -29,18 +31,19 @@ const ContextOption: FC<ContextOptionProps> = ({option, setIsVisible}) => {
       onMouseOver={() => setSubContextIsVisible(true)}
       onMouseOut={() => setSubContextIsVisible(false)}
     >
-      {display}
-      {options?.length 
+      {label}
+      {children
         ? <>
           <i className="fa fa-arrow-right" /> 
-          <SubContextMenu 
-            options={options} 
+          <SubContextMenu
             target={optionRef}
             visible={subContextIsVisible}
-          /> 
+          >
+            {children}
+          </SubContextMenu>
         </> : null}
     </div>
-  </>);
+  );
 };
 
 export default ContextOption;

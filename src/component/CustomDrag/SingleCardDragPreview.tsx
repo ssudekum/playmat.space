@@ -1,5 +1,5 @@
-import React, {CSSProperties, FC, memo} from 'react'
-import '../PhysicalCard/PhysicalCard.css'
+import React, {CSSProperties, FC, memo} from 'react';
+import '../PlaymatCard/PlaymatCard.css';
 
 export type SingleCardDragPreviewProps = {
   src?: string,
@@ -11,7 +11,7 @@ const SingleCardDragPreview: FC<SingleCardDragPreviewProps> = memo(({ src, style
     src={src}
     style={style}
     alt="card-preview"
-    className='physical-card-preview'>
+    className='playmat-card-preview'>
   </img>
 ));
 

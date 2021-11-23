@@ -1,9 +1,9 @@
 import React, { FC, useMemo } from 'react';
 import './Decklist.css';
-import Card from '../../../../lib/Card';
-import CountedCollection from '../../../../lib/CountedCollection';
-import TextCard from '../../../TextCard/TextCard';
-import Table, { TableColumn } from '../../../Table/Table';
+import Card from '../../../lib/Card';
+import CountedCollection from '../../../lib/CountedCollection';
+import TextCard from '../../TextCard/TextCard';
+import Table, { TableColumn } from '../../Table/Table';
 
 type TableProps = {
   cards: CountedCollection<Card>

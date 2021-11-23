@@ -1,14 +1,14 @@
 import React, {CSSProperties, FC} from 'react'
 import { XYCoord, useDragLayer, DragObjectWithType } from 'react-dnd'
 import Card, { getCardImage } from '../../lib/Card';
-import PlaymatCard from '../../lib/PlaymatCard';
+import PhysicalCard from '../../lib/PhysicalCard';
 import Draggable from '../../lib/Draggable';
 import SingleCardDragPreview from './SingleCardDragPreview';
 import MultiCardDragPreview from './MultiCardDragPreview';
 
 export type PhysicalCardsDO = DragObjectWithType & {
-  selectedCards: PlaymatCard[]
-  anchor: PlaymatCard
+  selectedCards: PhysicalCard[]
+  anchor: PhysicalCard
 };
 
 export type TextCardDO = DragObjectWithType & {

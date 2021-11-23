@@ -1,23 +1,29 @@
 .contextMenu {
+  padding: 5px 0;
   min-width: 150px;
   position: absolute;
+  color: white;
   background-color: grey;
   border: 1px solid black;
-  padding: 5px;
+  user-select: none;
 }
 
 .contextMenuOption {
   text-align: left;
   font-size: 14px;
-  padding: 5px 10px;
+  padding: 8px 15px;
   cursor: pointer;
   line-height: 14px;
 }
-
+/* .contextMenuOption:first-child {
+  padding: 10px 15px 5px;
+}
+.contextMenuOption:last-child {
+  padding: 5px 15px 10px;
+} */
 .contextMenuOption:hover {
   background-color: darkgrey;
 }
-
 .contextMenuOption > i {
   float: right;
 }

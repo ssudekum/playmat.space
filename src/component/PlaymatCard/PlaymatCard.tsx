@@ -1,24 +1,23 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import Draggable from '../../lib/Draggable';
-import PlaymatCard, { cardEquals, getCardImage } from '../../lib/PlaymatCard';
-import ContextMenu from './ContextMenu/ContextMenu';
-import './PhysicalCard.css';
+import PhysicalCard, { cardEquals, getCardImage } from '../../lib/PhysicalCard';
+import ContextMenuTrigger from '../ContextMenu/ContextMenuTrigger';
+import './PlaymatCard.css';
 
-export type PhysicalCardProps = {
+export type PlaymatCardProps = {
   zIndex: number;
-  playmatCard: PlaymatCard;
-  selectedCards: PlaymatCard[];
-  setSelectedCards: (cards: PlaymatCard[]) => void;
+  playmatCard: PhysicalCard;
+  selectedCards: PhysicalCard[];
+  setSelectedCards: (cards: PhysicalCard[]) => void;
   isDraggingSelection: boolean;
   setIsDraggingSelection: (isDraggingSelection: boolean) => void;
   isAnimated: boolean;
   animate: () => void;
-  addCopies: (cards: PlaymatCard[]) => void;
 };
 
-const PhysicalCard: React.FC<PhysicalCardProps> = ({
+const PlaymatCard: React.FC<PlaymatCardProps> = ({
   zIndex,
   playmatCard,
   selectedCards, 
@@ -27,10 +26,8 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   setIsDraggingSelection,
   isAnimated,
   animate,
-  addCopies
 }) => {
-  const id = `physical-card_${playmatCard.card.id}_${playmatCard.copy}`;
-  const cardRef = useRef(null);
+  const id = `playmat-card_${playmatCard.card.id}_${playmatCard.copy}`;
 
   const [{ isDragging }, drag, preview] = useDrag({
     item: {
@@ -74,16 +71,6 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     setSelectedCards(nextSelectedCards);
   };
 
-  const flip = () => {
-    const isFlipped = !playmatCard.isFlipped;
-    let nextSelectedCards = [...selectedCards];
-    nextSelectedCards = nextSelectedCards.map((selectedCard) => {
-      selectedCard.isFlipped = isFlipped;
-      return selectedCard;
-    });
-    setSelectedCards(nextSelectedCards);
-  };
-
   const classNames = [];
   if (isSelected) {
     classNames.push('selected');
@@ -97,64 +84,25 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   if (playmatCard.isTapped) {
     classNames.push('tapped');
   }
-
-  const options = [
-    {
-      display: 'Flip',
-      onClick: flip
-    },{
-      display: 'Clone',
-      onClick: () => addCopies(selectedCards)
-    },{
-      display: 'Add Counter',
-      onClick: () => {}
-    },{
-      display: 'Move to',
-      options: [{
-        display: 'Graveyard',
-        onClick: () => {}
-      },{
-        display: 'Exile',
-        onClick: () => {}
-      },{
-        display: 'Top of library',
-        onClick: () => {}
-      },{
-        display: 'X cards from the top of library',
-        onClick: () => {}
-      },{
-        display: 'Bottom of library',
-        onClick: () => {}
-      }]
-    }
-  ];
   
-  return (<>
-    <ContextMenu 
-      target={cardRef}
-      options={options}
-    />
-    <span 
-      ref={cardRef}
-      style={{
-        zIndex: zIndex
-      }}
-    >
+  return (
+    <ContextMenuTrigger id="playmat-menu" zIndex={zIndex}>
       <img
         id={id}
         ref={drag}
         style={{
           top: `${playmatCard.top}px`,
           left: `${playmatCard.left}px`,
+          zIndex,
         }}
-        className={`physical-card ${classNames.join(' ')}`}
+        className={`playmat-card ${classNames.join(' ')}`}
         alt={playmatCard.card.name}
         src={getCardImage(playmatCard)}
         onDoubleClick={tapUntap}
         onMouseDown={select}>
       </img>
-    </span>
-  </>);
+    </ContextMenuTrigger>
+  );
 }
 
-export default PhysicalCard;
+export default PlaymatCard;

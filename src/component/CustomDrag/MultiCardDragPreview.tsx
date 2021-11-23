@@ -1,11 +1,11 @@
 import React, {FC} from 'react'
-import PlaymatCard, { getCardImage } from '../../lib/PlaymatCard';
-import '../PhysicalCard/PhysicalCard.css'
+import PhysicalCard, { getCardImage } from '../../lib/PhysicalCard';
+import '../PlaymatCard/PlaymatCard.css'
 import SingleCardDragPreview from './SingleCardDragPreview';
 
 export type MultiCardDragPreviewProps = {
-  selectedCards: PlaymatCard[],
-  anchor: PlaymatCard
+  selectedCards: PhysicalCard[],
+  anchor: PhysicalCard
 };
 
 const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ selectedCards, anchor }) => {
@@ -14,7 +14,7 @@ const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ selectedCards, an
   let relativeLeft = anchor.left;
   let relativeTop = anchor.top;
   if (relativeTapped) {
-    const elementId = `physical-card_${anchor.card.id}_${anchor.copy}`;
+    const elementId = `playmat-card_${anchor.card.id}_${anchor.copy}`;
     const dimensions = document.getElementById(elementId)?.getBoundingClientRect();
     if (!dimensions) {
       throw Error(`Can't locate anchor card ${elementId} during drag`);
