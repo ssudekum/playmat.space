@@ -1,10 +1,10 @@
 import React, {CSSProperties, FC} from 'react'
 import { XYCoord, useDragLayer, DragObjectWithType } from 'react-dnd'
-import Card from '../../lib/Card';
-import { Draggable } from '../../lib/Draggable';
+import Card, { getCardImage } from '../../lib/Card';
+import PlaymatCard from '../../lib/PlaymatCard';
+import Draggable from '../../lib/Draggable';
 import SingleCardDragPreview from './SingleCardDragPreview';
 import MultiCardDragPreview from './MultiCardDragPreview';
-import { PlaymatCard } from '../Playmat/Playmat';
 
 export type PhysicalCardsDO = DragObjectWithType & {
   selectedCards: PlaymatCard[]
@@ -60,7 +60,7 @@ export const CustomDragLayer: FC = () => {
     switch (itemType) {
       case Draggable.TEXT_CARD:
         const textCardDO = item as TextCardDO;
-        return <SingleCardDragPreview src={textCardDO.card.image_uris ? textCardDO.card.image_uris.normal : undefined} />
+        return <SingleCardDragPreview src={getCardImage(textCardDO.card)} />
       case Draggable.PHYSICAL_CARDS:
         const physcialCardsDO = item as PhysicalCardsDO;
         return <MultiCardDragPreview {...physcialCardsDO} />

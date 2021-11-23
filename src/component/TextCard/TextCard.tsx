@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import './TextCard.css';
-import Card from '../../lib/Card';
+import Card, { getCardImage } from '../../lib/Card';
 import Tooltip from 'react-tooltip';
-import { Draggable } from '../../lib/Draggable';
+import Draggable from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom';
 
@@ -23,8 +23,8 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
     preview(getEmptyImage(), { captureDraggingState: true })
   }, [preview]);
 
-  const image = card.image_uris ? card.image_uris.normal : "";
-  
+  const image = getCardImage(card);
+
   const tooltip = () => (
     createPortal(
       <Tooltip

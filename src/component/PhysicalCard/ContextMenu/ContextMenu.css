@@ -1,0 +1,23 @@
+.contextMenu {
+  min-width: 150px;
+  position: absolute;
+  background-color: grey;
+  border: 1px solid black;
+  padding: 5px;
+}
+
+.contextMenuOption {
+  text-align: left;
+  font-size: 14px;
+  padding: 5px 10px;
+  cursor: pointer;
+  line-height: 14px;
+}
+
+.contextMenuOption:hover {
+  background-color: darkgrey;
+}
+
+.contextMenuOption > i {
+  float: right;
+}

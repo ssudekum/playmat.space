@@ -1,6 +1,6 @@
 import React, {FC} from 'react'
+import PlaymatCard, { getCardImage } from '../../lib/PlaymatCard';
 import '../PhysicalCard/PhysicalCard.css'
-import { PlaymatCard } from '../Playmat/Playmat';
 import SingleCardDragPreview from './SingleCardDragPreview';
 
 export type MultiCardDragPreviewProps = {
@@ -28,7 +28,7 @@ const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ selectedCards, an
     return (
       <SingleCardDragPreview
         key={i}
-        src={selected.card.image_uris?.normal}
+        src={getCardImage(selected)}
         style={{
           left: selected.left - relativeLeft,
           top: selected.top - relativeTop,

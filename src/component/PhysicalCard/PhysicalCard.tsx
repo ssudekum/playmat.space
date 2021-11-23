@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
-import { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
-import './PhysicalCard.css';
-import { Draggable } from '../../lib/Draggable';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { cardEquals, PlaymatCard } from '../Playmat/Playmat';
-import cardBack from '../../image/mtg-card-back.png';
+import Draggable from '../../lib/Draggable';
+import PlaymatCard, { cardEquals, getCardImage } from '../../lib/PlaymatCard';
+import ContextMenu from './ContextMenu/ContextMenu';
+import './PhysicalCard.css';
 
 export type PhysicalCardProps = {
   zIndex: number;
@@ -25,6 +24,7 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   setSelectedCards
 }) => {
   const id = `physical-card_${playmatCard.card.id}_${playmatCard.copy}`;
+  const cardRef = useRef(null);
 
   const isSelected = useMemo(() => (
     !!selectedCards.find((selected) => 
@@ -67,6 +67,18 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     setSelectedCards(nextSelectedCards);
   };
 
+  const flipAction = () => {
+    console.log('flipping');
+    const isFlipped = !playmatCard.isFlipped;
+    let nextSelectedCards = [...selectedCards];
+    nextSelectedCards = nextSelectedCards.map((selectedCard) => {
+      selectedCard.isFlipped = isFlipped;
+      return selectedCard;
+    });
+    console.log(nextSelectedCards);
+    setSelectedCards(nextSelectedCards);
+  };
+
   const classNames = [];
   if (isSelected) {
     classNames.push('selected');
@@ -78,22 +90,84 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     classNames.push('tapped');
   }
   
-  return (
-    <img
-      id={id}
-      ref={drag}
+  return (<>
+    <ContextMenu 
+      target={cardRef}
+      options={[
+        {
+          display: 'Flip',
+          onClick: flipAction
+        },
+        {
+          display: 'Clone',
+          onClick: () => {
+
+          }
+        },
+        {
+          display: 'Add Counter',
+          onClick: () => {
+
+          }
+        },
+        {
+          display: 'Move to',
+          options: [
+            {
+              display: 'Graveyard',
+              onClick: () => {
+    
+              }
+            },
+            {
+              display: 'Exile',
+              onClick: () => {
+    
+              }
+            },
+            {
+              display: 'Top of library',
+              onClick: () => {
+    
+              }
+            },
+            {
+              display: 'X cards from the top of library',
+              onClick: () => {
+    
+              }
+            },
+            {
+              display: 'Bottom of library',
+              onClick: () => {
+    
+              }
+            },
+          ]
+        }
+      ]}
+    />
+    <span 
+      ref={cardRef}
       style={{
-        top: `${playmatCard.top}px`,
-        left: `${playmatCard.left}px`,
-        zIndex: zIndex,
+        zIndex: zIndex
       }}
-      className={`physical-card ${classNames.join(' ')}`}
-      alt={playmatCard.card.name}
-      src={playmatCard.card.image_uris?.normal ?? cardBack}
-      onDoubleClick={tapUntapAction}
-      onMouseDown={select}>
-    </img>
-  );
+    >
+      <img
+        id={id}
+        ref={drag}
+        style={{
+          top: `${playmatCard.top}px`,
+          left: `${playmatCard.left}px`,
+        }}
+        className={`physical-card ${classNames.join(' ')}`}
+        alt={playmatCard.card.name}
+        src={getCardImage(playmatCard)}
+        onDoubleClick={tapUntapAction}
+        onMouseDown={select}>
+      </img>
+    </span>
+  </>);
 }
 
 export default PhysicalCard;

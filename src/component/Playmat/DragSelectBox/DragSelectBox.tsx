@@ -26,7 +26,7 @@ const emptyStyle: DragSelectBoxStyle = {
   zIndex: -1
 };
 
-export const DragSelectBox: React.FC<DragSelectBoxProps> = ({ originX, originY, isDragging, zIndex }) => {
+const DragSelectBox: React.FC<DragSelectBoxProps> = ({ originX, originY, isDragging, zIndex }) => {
   const [style, setStyle] = useState(emptyStyle);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -78,3 +78,5 @@ export const DragSelectBox: React.FC<DragSelectBoxProps> = ({ originX, originY, 
     </div>
   );
 }
+
+export default DragSelectBox;

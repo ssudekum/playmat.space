@@ -3,6 +3,16 @@
 
 import ImageURI from "./ImageURI";
 import Identifiable from "./Identifiable";
+import cardBack from "../image/mtg-card-back.png";
+
+export const getCardImage = (card: Card, flipped?: boolean) => {
+  if (card.card_faces) {
+    const faceNumber = flipped ? 1 : 0;
+    return card.card_faces[faceNumber].image_uris?.normal;
+  } else {
+    return flipped ? cardBack : card.image_uris?.normal;
+  }
+}
 
 /**
  * An interface representing Magic the Gathering cards results from the Scryfall API.
@@ -16,7 +26,7 @@ export default interface Card extends Identifiable {
   lang: string // A language code for this printing.
   mtgo_id?: number // This card’s Magic Online ID (also known as the Catalog ID), if any. A large percentage of cards are not available on Magic Online and do not have this ID.
   mtgo_foil_id?: number // This card’s foil Magic Online ID (also known as the Catalog ID), if any. A large percentage of cards are not available on Magic Online and do not have this ID.
-  multiverse_ids?: Array<string> // This card’s multiverse IDs on Gatherer, if any, as an array of numbers. Note that Scryfall includes many promo cards, tokens, and other esoteric objects that do not have these identifiers.
+  multiverse_ids?: string[] // This card’s multiverse IDs on Gatherer, if any, as an array of numbers. Note that Scryfall includes many promo cards, tokens, and other esoteric objects that do not have these identifiers.
   tcgplayer_id?: number // This card’s ID on TCGplayer’s API, also known as the productId.
   object: string // A content type for this object, always card.
   oracle_id: string // A unique UUID for this card’s oracle identity. This value is consistent across reprinted card editions, and unique among different cards with the same name (tokens, Unstable variants, etc).
@@ -28,11 +38,11 @@ export default interface Card extends Identifiable {
   // Gameplay Fields
   // Cards have the following properties relevant to the game rules:
 
-  all_parts?: Array<Card> // If this card is closely related to other cards, this property will be an array with Related Card Objects.
-  card_faces?: Array<Object> // An array of Card Face objects, if this card is multifaced.
+  all_parts?: Card[] // If this card is closely related to other cards, this property will be an array with Related Card Objects.
+  card_faces?: Card[] // An array of Card Face objects, if this card is multifaced.
   cmc: number // The card’s converted mana cost. Note that some funny cards have fractional mana costs.
   colors: string // This card’s colors, if the overall card has colors defined by the rules. Otherwise the colors will be on the card_faces objects, see below.
-  keywords: Array<string> // An array of keywords that this card uses, such as 'Flying' and 'Cumulative upkeep'.
+  keywords: string[] // An array of keywords that this card uses, such as 'Flying' and 'Cumulative upkeep'.
   color_identity: string // This card’s color identity.
   color_indicator?: string // The colors in this card’s color indicator, if any. A null value for this field indicates the card does not have one.
   edhrec_rank?: number // This card’s overall rank/popularity on EDHREC. Not all cards are ranked.
@@ -63,10 +73,10 @@ export default interface Card extends Identifiable {
   digital: boolean // True if this card was only released in a video game.
   flavor_name?: string // The just-for-fun name printed on the card (such as for Godzilla series cards).
   flavor_text?: string // The flavor text, if any.
-  frame_effects?: Array<string> // This card’s frame effects, if any.
+  frame_effects?: string[] // This card’s frame effects, if any.
   frame: string // This card’s frame layout.
   full_art: boolean // True if this card’s artwork is larger than normal.
-  games: Array<string> // A list of games that this card print is available in, paper, arena, and/or mtgo.
+  games: string[] // A list of games that this card print is available in, paper, arena, and/or mtgo.
   highres_image: boolean // True if this card’s imagery is high resolution.
   illustration_id?: string // A unique UUID for the card artwork that remains consistent across reprints. Newly spoiled cards may not have this field yet.
   image_uris?: ImageURI // An object listing available imagery for this card. See the Card Imagery article for more information.
@@ -75,7 +85,7 @@ export default interface Card extends Identifiable {
   printed_text?: string // The localized text printed on this card, if any.
   printed_type_line?: string // The localized type line printed on this card, if any.
   promo: boolean // True if this card is a promotional print.
-  promo_types?: Array<string>	// An array of strings describing what categories of promo cards this card falls into.
+  promo_types?: string[]	// An array of strings describing what categories of promo cards this card falls into.
   purchase_uris: Object // An object providing URIs to this card’s listing on major marketplaces.
   rarity: string // This card’s rarity. One of common, uncommon, rare, or mythic.
   related_uris: Object // An object providing URIs to this card’s listing on other Magic: The Gathering online resources.

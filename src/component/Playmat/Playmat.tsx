@@ -1,25 +1,15 @@
 import React, { FC, useState, useEffect, useMemo } from 'react'
 import { useDrop, DropTargetMonitor } from 'react-dnd'
-import Card from '../../lib/Card'
+import Card from '../../lib/Card';
+import PlaymatCard, { cardEquals } from '../../lib/PlaymatCard';
 import './Playmat.css'
-import { Draggable } from '../../lib/Draggable'
+import Draggable from '../../lib/Draggable'
 import PhysicalCard from '../PhysicalCard/PhysicalCard'
-import { DragSelectBox, DragSelectBoxProps } from './DragSelectBox/DragSelectBox'
+import DragSelectBox, { DragSelectBoxProps } from './DragSelectBox/DragSelectBox';
 import playmatImage from '../../image/goyf-playmat.jpg'
 import CountedCollection from '../../lib/CountedCollection';
 import Deckbox from './Deckbox/Deckbox';
 import { PhysicalCardsDO, TextCardDO } from '../CustomDrag/CustomDragLayer'
-
-export type PlaymatCard = {
-  card: Card;
-  copy: number;
-  left: number;
-  top: number;
-  isTapped: boolean;
-};
-
-export const cardEquals = (a: PlaymatCard, b: PlaymatCard) => 
-  a.card.id === b.card.id && a.copy === b.copy;
 
 let playmatStyle = {};
 if (playmatImage) {
@@ -121,7 +111,6 @@ const Playmat: FC = () => {
       copy: nextCardCollection.counts[card.id],
       left: offsetX,
       top: offsetY,
-      isTapped: false
     });
 
     setCardStack(nextCardStack);
@@ -140,7 +129,6 @@ const Playmat: FC = () => {
           left: document.body.clientWidth / 2,
           top: document.body.clientHeight / 2,
           copy: nextCardCollection.counts[card.id],
-          isTapped: false,
         });
       }
     }
@@ -190,6 +178,9 @@ const Playmat: FC = () => {
         }
       }
 
+      console.log('its me');
+      console.log(selectedCards);
+      console.log(nextSelectedCards);
       setSelectedCards(nextSelectedCards);
       setDragSelectBoxProps({
         originX: 0,
@@ -222,12 +213,16 @@ const Playmat: FC = () => {
       className="playmat" 
       style={playmatStyle}
       onMouseUp={selectArea}
-      onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => setDragSelectBoxProps({
-        originX: event.pageX,
-        originY: event.pageY,
-        isDragging: true,
-        zIndex: cardStack.length + 3,
-      })}
+      onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (event.button === 0) {
+          setDragSelectBoxProps({
+            originX: event.pageX,
+            originY: event.pageY,
+            isDragging: true,
+            zIndex: cardStack.length + 3,
+          });
+        }
+      }}
     >
       <DragSelectBox {...dragSelectBoxProps} />
       {physicalCards}
