@@ -115,8 +115,27 @@ const Playmat: FC = () => {
 
     setCardStack(nextCardStack);
   }
-  
-  const addCards = (adds: CountedCollection<Card>) => {
+
+  const addCopies = (cards: PlaymatCard[]) => {
+    const nextCardCollection = new CountedCollection(cardCollection);
+    const nextCardStack = [...cardStack];
+
+    for (const playmatCard of cards) {
+      const card = playmatCard.card;
+      nextCardCollection.addOne(card);
+      nextCardStack.push({
+        ...playmatCard,
+        top: playmatCard.top + 25,
+        left: playmatCard.left + 25,
+        copy: nextCardCollection.counts[card.id]
+      });
+    }
+
+    setCardCollection(nextCardCollection);
+    setCardStack(nextCardStack);
+  };
+
+  const addCollection = (adds: CountedCollection<Card>) => {
     const nextCardCollection = new CountedCollection(cardCollection);
     const nextCardStack = [...cardStack];
 
@@ -178,9 +197,6 @@ const Playmat: FC = () => {
         }
       }
 
-      console.log('its me');
-      console.log(selectedCards);
-      console.log(nextSelectedCards);
       setSelectedCards(nextSelectedCards);
       setDragSelectBoxProps({
         originX: 0,
@@ -200,13 +216,14 @@ const Playmat: FC = () => {
         isDraggingCards={isDraggingCards}
         setIsDraggingCards={setIsDraggingCards}
         selectedCards={selectedCards}
-        setSelectedCards={setSelectedCards}>
+        setSelectedCards={setSelectedCards}
+        addCopies={addCopies}>
       </PhysicalCard>
     ))
   }, [cardStack, selectedCards, isDraggingCards]);
 
   return <>
-    <Deckbox addPlaymatCards={addCards} />
+    <Deckbox addCollection={addCollection} />
     <div 
       ref={drop} 
       id="playmat" 

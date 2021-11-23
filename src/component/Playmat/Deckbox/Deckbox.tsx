@@ -7,10 +7,10 @@ import CardSearch from './CardSearch/CardSearch';
 import './Deckbox.css'
 
 type DeckboxProps = {
-  addPlaymatCards: (cards: CountedCollection<Card>) => void
+  addCollection: (cards: CountedCollection<Card>) => void
 };
 
-const Deckbox: FC<DeckboxProps> = ({ addPlaymatCards }) => {
+const Deckbox: FC<DeckboxProps> = ({ addCollection }) => {
   const [isDeckboxVisible, setIsDeckboxVisible] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cards, setCards] = useState<CountedCollection<Card>>(new CountedCollection());
@@ -50,7 +50,7 @@ const Deckbox: FC<DeckboxProps> = ({ addPlaymatCards }) => {
           <button
             className="button" 
             disabled={cards.getTotalCount() === 0 ? true : false} 
-            onClick={() => addPlaymatCards(cards)}>
+            onClick={() => addCollection(cards)}>
             Add to Playmat
           </button>
 

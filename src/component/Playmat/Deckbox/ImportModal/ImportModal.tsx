@@ -52,7 +52,7 @@ export const ImportModal: FC<ImportModalProps> = ({ visible, setVisible, onImpor
 
         onImport(totalCardResults)
       }).catch((error) => {
-        console.log(error)
+        console.error(error)
       }).finally(() => {
         setVisible(false)
         setIsLoading(false)
@@ -74,7 +74,7 @@ export const ImportModal: FC<ImportModalProps> = ({ visible, setVisible, onImpor
         return res.data
       })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   };
 

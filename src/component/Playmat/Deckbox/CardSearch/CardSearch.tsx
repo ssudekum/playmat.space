@@ -32,11 +32,11 @@ const CardSearch: React.FC<{ onSelect: Function }> = props => {
             setResults(res.data);
             setBadQuery(false);
           }).catch((error) => {
-            console.log(error);
+            console.error(error);
           });
         }
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
       });
     } else {
       token();

@@ -12,7 +12,8 @@ export type PhysicalCardProps = {
   isDraggingCards: boolean;
   setIsDraggingCards: (dragging: boolean) => void;
   selectedCards: PlaymatCard[];
-  setSelectedCards: (ids: PlaymatCard[]) => void;
+  setSelectedCards: (cards: PlaymatCard[]) => void;
+  addCopies: (cards: PlaymatCard[]) => void
 };
 
 const PhysicalCard: React.FC<PhysicalCardProps> = ({
@@ -21,7 +22,8 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
   isDraggingCards, 
   setIsDraggingCards, 
   selectedCards, 
-  setSelectedCards
+  setSelectedCards,
+  addCopies
 }) => {
   const id = `physical-card_${playmatCard.card.id}_${playmatCard.copy}`;
   const cardRef = useRef(null);
@@ -57,7 +59,7 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     setSelectedCards(nextSelectedCards);
   };
 
-  const tapUntapAction = () => {
+  const tapUntap = () => {
     const isTapped = !playmatCard.isTapped;
     let nextSelectedCards = [...selectedCards];
     nextSelectedCards = nextSelectedCards.map((selectedCard) => {
@@ -67,15 +69,13 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
     setSelectedCards(nextSelectedCards);
   };
 
-  const flipAction = () => {
-    console.log('flipping');
+  const flip = () => {
     const isFlipped = !playmatCard.isFlipped;
     let nextSelectedCards = [...selectedCards];
     nextSelectedCards = nextSelectedCards.map((selectedCard) => {
       selectedCard.isFlipped = isFlipped;
       return selectedCard;
     });
-    console.log(nextSelectedCards);
     setSelectedCards(nextSelectedCards);
   };
 
@@ -96,13 +96,11 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
       options={[
         {
           display: 'Flip',
-          onClick: flipAction
+          onClick: flip
         },
         {
           display: 'Clone',
-          onClick: () => {
-
-          }
+          onClick: () => addCopies(selectedCards)
         },
         {
           display: 'Add Counter',
@@ -163,7 +161,7 @@ const PhysicalCard: React.FC<PhysicalCardProps> = ({
         className={`physical-card ${classNames.join(' ')}`}
         alt={playmatCard.card.name}
         src={getCardImage(playmatCard)}
-        onDoubleClick={tapUntapAction}
+        onDoubleClick={tapUntap}
         onMouseDown={select}>
       </img>
     </span>
