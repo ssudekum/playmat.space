@@ -1,4 +1,4 @@
-import { SHOW_CONTEXT_MENU, HIDE_CONTEXT_MENUS } from "../actions";
+import { ReducerActionType, ReducerAction } from "../actions";
 
 export type ContextMenuData = {
   id: string;
@@ -12,22 +12,21 @@ export type ContextMenuStore = {
   [id: string]: ContextMenuData;
 };
 
-export type ContextMenuAction = {
-  type: string;
-  value?: any;
-};
+export default function (state: ContextMenuStore = {}, { type, value }: ReducerAction) {
+  switch (type) {
+    case ReducerActionType.SHOW_CONTEXT_MENU: 
+      if (!value?.id) {
+        throw new Error(`SHOW_CONTEXT_MENU missing ReducerAction value { id: string }`);
+      };
 
-export default function (state: ContextMenuStore = {}, action: ContextMenuAction) {
-  switch (action.type) {
-    case SHOW_CONTEXT_MENU: 
       return {
         ...state,
-        [action.value.id]: {
-          ...action.value,
+        [value?.id]: {
+          ...value,
           visible: true,
         }
       };
-    case HIDE_CONTEXT_MENUS: 
+    case ReducerActionType.HIDE_CONTEXT_MENUS: 
       return Object.values(state)
         .reduce((next: ContextMenuStore, contextMenu) => {
           contextMenu.visible = false;

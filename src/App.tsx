@@ -9,12 +9,22 @@ import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
 import SettingsButton from './component/Settings/SettingsButton';
 import Banner from './component/Banner/Banner';
 import { useDispatch } from 'react-redux';
-import { hideMenus } from './redux/actions';
+import { hideContextMenus, setIsDragging } from './redux/actions';
 
 const App: FC = () => {
   const dispatch = useDispatch();
+
   return (
-    <div id="app" className="App" onMouseDown={() => dispatch(hideMenus())}>
+    <div 
+      id="app"
+      className="App"
+      onMouseDown={() => {
+        dispatch(hideContextMenus());
+      }}
+      onMouseUp={() => {
+        dispatch(setIsDragging(false));
+      }}
+    >
       <DndProvider backend={HTML5Backend}>
         <Playmat />
         <CustomDragLayer />

@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { useDispatch } from "react-redux";
-import { showMenu } from "../../redux/actions";
+import { showContextMenu } from "../../redux/actions";
 
 export type ContextMenuTriggerProps = {
   id: string;
@@ -13,7 +13,7 @@ const ContextMenuTrigger: FC<ContextMenuTriggerProps> = ({id, zIndex, children})
   return (
     <div onContextMenu={(e) => {
       // TODO: retrieve zIndex from e.currentTarget.children???
-      dispatch(showMenu(id, e.pageX, e.pageY, zIndex + 1));
+      dispatch(showContextMenu(id, e.pageX, e.pageY, zIndex + 1));
       e.preventDefault();
     }}>
       {children}

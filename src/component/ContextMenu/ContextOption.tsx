@@ -1,7 +1,6 @@
-import React, { FC, useContext, useEffect, useRef, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { hideMenus } from "../../redux/actions";
-import { MenuContext } from './ContextMenu';
+import { hideContextMenus } from "../../redux/actions";
 import SubContextMenu from './SubContextMenu';
 
 export type ContextOptionProps = {
@@ -19,7 +18,7 @@ const ContextOption: FC<ContextOptionProps> = ({label, onClick, children}) => {
     if (onClick) {
       onClick();
     }
-    dispatch(hideMenus());
+    dispatch(hideContextMenus());
   };
 
   return (

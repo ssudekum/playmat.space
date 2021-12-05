@@ -1,17 +1,21 @@
-import React, { FC, useState, useEffect, useMemo } from 'react'
+import React, { FC, useState, useEffect, useMemo, MouseEvent } from 'react'
 import { useDrop, DropTargetMonitor } from 'react-dnd'
+
 import Card from '../../lib/Card';
 import PhysicalCard, { cardEquals } from '../../lib/PhysicalCard';
 import './Playmat.css'
 import Draggable from '../../lib/Draggable'
 import PlaymatCard from '../PlaymatCard/PlaymatCard'
-import DragSelectBox, { DragSelectBoxProps } from './DragSelectBox/DragSelectBox';
+import DragSelectBox from './DragSelectBox/DragSelectBox';
 import playmatImage from '../../image/goyf-playmat.jpg'
 import CountedCollection from '../../lib/CountedCollection';
 import Deckbox from '../Deckbox/Deckbox';
 import { PhysicalCardsDO, TextCardDO } from '../CustomDrag/CustomDragLayer';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import ContextOption from '../ContextMenu/ContextOption';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/reducers';
+import { setIsDragging } from '../../redux/actions';
 
 let playmatStyle = {};
 if (playmatImage) {
@@ -21,16 +25,22 @@ if (playmatImage) {
 }
 
 const Playmat: FC = () => {
+  const dispatch = useDispatch();
   const [cardStack, setCardStack] = useState<PhysicalCard[]>([]);
   const [cardCollection, setCardCollection] = useState(new CountedCollection<Card>());
   const [selectedCards, setSelectedCards] = useState<PhysicalCard[]>([]);
   const [isDraggingSelection, setIsDraggingSelection] = useState(false);
   const [isAnimatingCards, setIsAnimatingCards] = useState(false);
-  const [dragSelectBoxProps, setDragSelectBoxProps] = useState<DragSelectBoxProps>({
-    originX: 0,
-    originY: 0,
-    isDragging: false,
-    zIndex: -1,
+
+  const isDragging = useSelector((state: RootState) => state.dragSelectReducer.isDragging);
+  const [dragSelectIndex, setDragSelectIndex] = useState(0);
+  const [dragOrigin, setDragOrigin] = useState({
+    x: 0,
+    y: 0,
+  });
+  const [dragPosition, setDragPosition] = useState({
+    x: 0,
+    y: 0,
   });
 
   const [, drop] = useDrop({
@@ -140,55 +150,42 @@ const Playmat: FC = () => {
     setCardStack(nextCardStack);
   };
 
-  const selectArea = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (dragSelectBoxProps.isDragging) {
-      const nextSelectedCards = [];
-      const originX = dragSelectBoxProps.originX;
-      const originY = dragSelectBoxProps.originY;
-      const mouseX = event.pageX;
-      const mouseY = event.pageY;
+  const selectArea = (originX: number, originY: number, pageX: number, pageY: number) => {
+    const nextSelectedCards = [];
+    for (const playmatCard of cardStack) {
+      const {left, top} = playmatCard;
+      const minY = top;
+      const minX = left;
+      const maxY = minY + 300; // card height
+      const maxX = minX + 214; // card width
 
-      for (const playmatCard of cardStack) {
-        const {left, top} = playmatCard;
-        const minY = top;
-        const minX = left;
-        const maxY = minY + 300; // card height
-        const maxX = minX + 214; // card width
+      const leftOrigin = minX > originX && originX < maxX
+      const centerXOrigin = minX < originX && originX < maxX
+      const rightOrigin = minX < originX && originX > maxX
+      const aboveOrigin = minY > originY && originY < maxY
+      const centerYOrigin = minY < originY && originY < maxY
+      const belowOrigin = minY < originY && originY > maxY
+      const leftMouse = minX > pageX && pageX < maxX
+      const rightMouse = minX < pageX && pageX > maxX
+      const aboveMouse = minY > pageY && pageY < maxY
+      const belowMouse = minY < pageY && pageY > maxY
 
-        const leftOrigin = minX > originX && originX < maxX
-        const centerXOrigin = minX < originX && originX < maxX
-        const rightOrigin = minX < originX && originX > maxX
-        const aboveOrigin = minY > originY && originY < maxY
-        const centerYOrigin = minY < originY && originY < maxY
-        const belowOrigin = minY < originY && originY > maxY
-        const leftMouse = minX > mouseX && mouseX < maxX
-        const rightMouse = minX < mouseX && mouseX > maxX
-        const aboveMouse = minY > mouseY && mouseY < maxY
-        const belowMouse = minY < mouseY && mouseY > maxY
-
-        // selection is based on where the mouse cannot be, given some point of origin
-        const selected = ((leftOrigin && aboveOrigin && !leftMouse && !aboveMouse) || // upper left
-          (leftOrigin && centerYOrigin && !leftMouse) || // left of center
-          (leftOrigin && belowOrigin && !leftMouse && !belowMouse) || // bottom left
-          (centerXOrigin && aboveOrigin && !aboveMouse) || // above center
-          (centerXOrigin && belowOrigin && !belowMouse) || // below center
-          (rightOrigin && aboveOrigin && !rightMouse && !aboveMouse) || // upper right
-          (rightOrigin && centerYOrigin && !rightMouse) || // right of center
-          (rightOrigin && belowOrigin && !rightMouse && !belowMouse)) // bottom right
-          
-        if (selected) {
-          nextSelectedCards.push(playmatCard);
-        }
+      // selection is based on where the mouse cannot be, given some point of origin
+      const selected = ((leftOrigin && aboveOrigin && !leftMouse && !aboveMouse) || // upper left
+        (leftOrigin && centerYOrigin && !leftMouse) || // left of center
+        (leftOrigin && belowOrigin && !leftMouse && !belowMouse) || // bottom left
+        (centerXOrigin && aboveOrigin && !aboveMouse) || // above center
+        (centerXOrigin && belowOrigin && !belowMouse) || // below center
+        (rightOrigin && aboveOrigin && !rightMouse && !aboveMouse) || // upper right
+        (rightOrigin && centerYOrigin && !rightMouse) || // right of center
+        (rightOrigin && belowOrigin && !rightMouse && !belowMouse)) // bottom right
+        
+      if (selected) {
+        nextSelectedCards.push(playmatCard);
       }
-
-      setSelectedCards(nextSelectedCards);
-      setDragSelectBoxProps({
-        originX: 0,
-        originY: 0,
-        isDragging: false,
-        zIndex: -1
-      });
     }
+
+    setSelectedCards(nextSelectedCards);
   };
 
   const animate = () => {
@@ -215,8 +212,7 @@ const Playmat: FC = () => {
     ))
   }, [cardStack, selectedCards, isDraggingSelection, isAnimatingCards]);
 
-  const flipSelected = () => {
-    console.log(selectedCards);
+  const flip = () => {
     let nextSelectedCards = [...selectedCards];
     nextSelectedCards = nextSelectedCards.map((selectedCard) => {
       selectedCard.isFlipped = !selectedCard.isFlipped;
@@ -225,7 +221,7 @@ const Playmat: FC = () => {
     setSelectedCards(nextSelectedCards);
   };
 
-  const cloneSelected = () => {
+  const clone = () => {
     const nextCardCollection = new CountedCollection(cardCollection);
     const nextCardStack = [...cardStack];
 
@@ -244,6 +240,34 @@ const Playmat: FC = () => {
     setCardStack(nextCardStack);
   };
 
+  const moveToFront = () => {
+
+  };
+
+  const moveToBack = () => {
+    
+  };
+
+  const moveToGraveyard = () => {
+    
+  };
+
+  const moveToExile = () => {
+    
+  };
+
+  const moveToTopOfLibrary = () => {
+    
+  };
+
+  const moveXFromTopOfLibrary = () => {
+    
+  };
+
+  const moveToBottomOfLibrary = () => {
+    
+  };
+
   return <>
     <Deckbox addCollection={addCollection} />
     <div
@@ -251,25 +275,42 @@ const Playmat: FC = () => {
       id="playmat"
       className="playmat"
       style={playmatStyle}
-      onMouseUp={selectArea}
-      onMouseDown={(event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      onMouseDown={(event: MouseEvent) => {
         if (event.button === 0) {
-          setDragSelectBoxProps({
-            originX: event.pageX,
-            originY: event.pageY,
-            isDragging: true,
-            zIndex: cardStack.length + 3,
+          dispatch(setIsDragging(true));
+          setDragSelectIndex(cardStack.length + 3);
+          setDragOrigin({
+            x: event.pageX, 
+            y: event.pageY,
+          });
+          setDragPosition({
+            x: event.pageX, 
+            y: event.pageY,
+          });
+        }
+      }}
+      onMouseMove={(event: MouseEvent) => {
+        if (isDragging) {
+          setDragPosition({
+            x: event.pageX, 
+            y: event.pageY,
           });
         }
       }}
     >
-      <DragSelectBox {...dragSelectBoxProps} />
+      <DragSelectBox origin={dragOrigin} position={dragPosition} zIndex={dragSelectIndex} onSelect={selectArea} />
+
       <ContextMenu id="playmat-menu">
-        <ContextOption label="Flip" onClick={flipSelected} />
-        <ContextOption label="Clone" onClick={cloneSelected} />
+        <ContextOption label="Flip" onClick={flip} />
+        <ContextOption label="Clone" onClick={clone} />
         <ContextOption label="Move to">
-          <ContextOption label="Graveyard" onClick={cloneSelected} />
-          <ContextOption label="Exile" onClick={cloneSelected} />
+          <ContextOption label="Front" onClick={moveToFront} />
+          <ContextOption label="Back" onClick={moveToBack} />
+          <ContextOption label="Graveyard" onClick={moveToGraveyard} />
+          <ContextOption label="Exile" onClick={moveToExile} />
+          <ContextOption label="Top of Library" onClick={moveToTopOfLibrary} />
+          <ContextOption label="X card(s) from the Top of Library" onClick={moveXFromTopOfLibrary} />
+          <ContextOption label="Bottom of Library in random order" onClick={moveToBottomOfLibrary} />
         </ContextOption>
       </ContextMenu>
       {physicalCards}
