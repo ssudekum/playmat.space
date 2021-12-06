@@ -16,7 +16,10 @@ export const Modal : React.FC<ModalProps> = props => {
 
     return ReactDOM.createPortal(
       <div className={`mask ${visible ? 'show' : ''}`} 
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}>
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}>
           <div id={id} className={`modal ${visible ? '' : 'hidden'}`}>
               <i className="fas fa-times close" onClick={() => setVisible(false)}></i>
               {children}

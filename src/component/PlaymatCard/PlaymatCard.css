@@ -6,6 +6,7 @@
   background-image: url('../../image/mtg-card-back.png');
   background-size: cover;
   background-repeat: no-repeat;
+  user-select: none;
 }
 
 .playmat-card-preview {

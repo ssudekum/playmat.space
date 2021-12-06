@@ -69,13 +69,13 @@ const getDimensions = (
 
 const DragSelectBox: React.FC<DragSelectBoxProps> = ({ zIndex, origin, position, onSelect }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const isDragging = useSelector((state: RootState) => state.dragSelectReducer.isDragging);
   const [dimensions, setDimensions] = useState({
     height: 0,
     top: 0,
     width: 0,
     left: 0,
   });
-  const isDragging = useSelector((state: RootState) => state.dragSelectReducer.isDragging);
 
   useEffect(() => {
     if (isDragging) {

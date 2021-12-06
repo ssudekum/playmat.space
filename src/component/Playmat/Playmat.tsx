@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useMemo, MouseEvent } from 'react'
+import React, { FC, useState, useEffect, useMemo, MouseEvent, CSSProperties } from 'react'
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 
 import Card from '../../lib/Card';
@@ -17,9 +17,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers';
 import { setIsDragging } from '../../redux/actions';
 
-let playmatStyle = {};
+let playmatStyle: CSSProperties = {
+  userSelect: 'none'
+};
 if (playmatImage) {
   playmatStyle = {
+    userSelect: 'none',
     backgroundImage: `url(${playmatImage})`
   }
 }
@@ -270,6 +273,7 @@ const Playmat: FC = () => {
 
   return <>
     <Deckbox addCollection={addCollection} />
+
     <div
       ref={drop}
       id="playmat"
