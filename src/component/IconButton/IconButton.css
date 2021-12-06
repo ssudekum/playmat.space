@@ -1,14 +1,15 @@
-.settingsIcon {
+
+.iconButton {
   position: absolute;
   font-size: 30px;
   opacity: 0.5;
   color: white;
-  top: 20px;
-  right: 25px;
   height: 35px;
   width: 45px;
   cursor: pointer;
+  transition: opacity 0.1s ease;
 }
-.settingsIcon:hover {
+
+.iconButton:hover {
   opacity: 1;
 }

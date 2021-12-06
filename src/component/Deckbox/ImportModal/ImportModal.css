@@ -1,13 +1,14 @@
-#importData {
-  height: 200px;
-  width: 90%;
-}
 
 #importModal {
   width: 25%;
   height: auto;
   padding-left: 0;
   padding-right: 0;
+}
+
+#importData {
+  height: 200px;
+  width: 90%;
 }
 
 #importButton {

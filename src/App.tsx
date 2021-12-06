@@ -8,7 +8,8 @@ import Playmat from './component/Playmat/Playmat';
 import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
 import SettingsButton from './component/Settings/SettingsButton';
 import { useDispatch } from 'react-redux';
-import { hideContextMenus, setIsDragging } from './redux/actions';
+import { decreaseCardSize, hideContextMenus, increaseCardSize, setIsDragging } from './redux/actions';
+import IconButton from './component/IconButton/IconButton';
 
 const App: FC = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,26 @@ const App: FC = () => {
       </DndProvider>
 
       <Logo />
+      
       <SettingsButton />
+      
+      <IconButton
+        icon="fas fa-search-plus"
+        onClick={() => dispatch(increaseCardSize())}
+        style={{
+          top: '75px', 
+          right: '25px',
+        }}
+      />
+
+      <IconButton
+        icon="fas fa-search-minus"
+        onClick={() => dispatch(decreaseCardSize())}
+        style={{
+          top: '130px', 
+          right: '25px',
+        }}
+      />
     </div>
   );
 };

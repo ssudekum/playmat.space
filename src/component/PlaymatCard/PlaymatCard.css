@@ -1,5 +1,4 @@
 .playmat-card {
-  height: 300px;
   border-radius: 15px;
   position: absolute;
   cursor: pointer;
@@ -10,7 +9,6 @@
 }
 
 .playmat-card-preview {
-  height: 300px;
   border-radius: 15px;
   position: absolute;
   cursor: pointer;

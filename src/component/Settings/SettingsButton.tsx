@@ -1,14 +1,20 @@
 import React, { FC, useState } from 'react';
 import SettingsModal from './SettingsModal';
-import './Settings.css';
+import IconButton from '../IconButton/IconButton';
 
 const SettingsButton: FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   return <>
-    <div className="settingsIcon" onClick={() => setIsModalVisible(true)}>
-      <i className="fas fa-cogs"></i>
-    </div>
+    <IconButton
+      icon="fa fa-cogs"
+      onClick={() => setIsModalVisible(true)}
+      style={{
+        top: '20px',
+        right: '25px',
+      }}
+    />
+
     <div 
       className={`mask ${isModalVisible ? 'show' : ''}`}
       onClick={(e) => { 

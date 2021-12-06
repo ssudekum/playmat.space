@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Draggable from '../../lib/Draggable';
 import PhysicalCard, { cardEquals, getCardImage } from '../../lib/PhysicalCard';
 import { hideContextMenus } from '../../redux/actions';
+import { RootState } from '../../redux/reducers';
+import { BASE_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
 import ContextMenuTrigger from '../ContextMenu/ContextMenuTrigger';
 import './PlaymatCard.css';
 
@@ -30,6 +32,7 @@ const PlaymatCard: React.FC<PlaymatCardProps> = ({
   animate,
 }) => {
   const dispatch = useDispatch();
+  const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   const id = `playmat-card_${playmatCard.card.id}_${playmatCard.copy}`;
   const [{ isDragging }, drag, preview] = useDrag({
     item: {
@@ -94,6 +97,7 @@ const PlaymatCard: React.FC<PlaymatCardProps> = ({
         id={id}
         ref={drag}
         style={{
+          height: `${BASE_CARD_HEIGHT * cardSize}px`,
           top: `${playmatCard.top}px`,
           left: `${playmatCard.left}px`,
           zIndex,

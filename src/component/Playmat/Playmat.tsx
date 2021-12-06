@@ -16,6 +16,7 @@ import ContextOption from '../ContextMenu/ContextOption';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/reducers';
 import { setIsDragging } from '../../redux/actions';
+import { BASE_CARD_HEIGHT, BASE_CARD_WIDTH } from '../../redux/reducers/CardSizeReducer';
 
 let playmatStyle: CSSProperties = {
   userSelect: 'none'
@@ -34,7 +35,7 @@ const Playmat: FC = () => {
   const [selectedCards, setSelectedCards] = useState<PhysicalCard[]>([]);
   const [isDraggingSelection, setIsDraggingSelection] = useState(false);
   const [isAnimatingCards, setIsAnimatingCards] = useState(false);
-
+  const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   const isDragging = useSelector((state: RootState) => state.dragSelectReducer.isDragging);
   const [dragSelectIndex, setDragSelectIndex] = useState(0);
   const [dragOrigin, setDragOrigin] = useState({
@@ -159,8 +160,8 @@ const Playmat: FC = () => {
       const {left, top} = playmatCard;
       const minY = top;
       const minX = left;
-      const maxY = minY + 300; // card height
-      const maxX = minX + 214; // card width
+      const maxY = minY + (BASE_CARD_HEIGHT * cardSize);
+      const maxX = minX + (BASE_CARD_WIDTH * cardSize);
 
       const leftOrigin = minX > originX && originX < maxX
       const centerXOrigin = minX < originX && originX < maxX
