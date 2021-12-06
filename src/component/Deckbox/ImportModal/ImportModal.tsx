@@ -1,8 +1,7 @@
-import React, { FC, useState } from 'react'
-import './ImportModal.css'
-import { Modal, ModalProps } from '../../Modal/Modal'
-import CountedCollection from '../../../lib/CountedCollection'
-import Card from '../../../lib/Card'
+import React, { FC, useState } from 'react';
+import { Modal, ModalProps } from '../../Modal/Modal';
+import CountedCollection from '../../../lib/CountedCollection';
+import Card from '../../../lib/Card';
 
 type ImportModalProps = ModalProps & {
   onImport: (cards: CountedCollection<Card>) => void
@@ -79,13 +78,31 @@ export const ImportModal: FC<ImportModalProps> = ({ visible, setVisible, onImpor
   };
 
   return (
-    <Modal id="importModal" visible={visible} setVisible={setVisible}>
-      <textarea id="importData" />
+    <Modal 
+      visible={visible}
+      setVisible={setVisible}
+      style={{
+        width: '25%',
+        height: 'auto',
+      }}
+    >
+      <textarea
+        id="importData" 
+        style={{
+          height: '200px',
+          width: '100%', 
+        }}
+      />
+      
       <button 
-        id="importButton"
         className="button"
         onClick={doImport}
-        disabled={isLoading}>
+        disabled={isLoading}
+        style={{
+          width: '100%',
+          float: 'none',
+        }}
+      >
         {isLoading ? <>
           <i className="fa fa-spinner fa-spin" /> Working
         </>: 'Import'}

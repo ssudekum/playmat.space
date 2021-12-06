@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import './App.css';
+import './component/Modal/Modal.css'
 import Logo from './component/Logo/Logo';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -31,7 +32,7 @@ const App: FC = () => {
       </DndProvider>
 
       <Logo />
-      
+
       <SettingsButton />
       
       <IconButton

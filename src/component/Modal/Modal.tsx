@@ -1,30 +1,24 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import ReactDOM from 'react-dom';
-import './Modal.css'
 
 export interface ModalProps {
-    id?: string,
-    visible: boolean,
-    setVisible: (visible: boolean) => void
+  visible: boolean,
+  setVisible: (visible: boolean) => void,
+  style?: CSSProperties,
 }
 
-export const Modal : React.FC<ModalProps> = props => {
-    const {id, visible, setVisible, children} = props;
-
-    const app = document.getElementById('app');
-    if (!app) return <></>;
-
+export const Modal : React.FC<ModalProps> = ({visible, setVisible, style, children}) => {
     return ReactDOM.createPortal(
       <div className={`mask ${visible ? 'show' : ''}`} 
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
           }}>
-          <div id={id} className={`modal ${visible ? '' : 'hidden'}`}>
+          <div className={`modal${visible ? '' : ' hidden'}`} style={style}>
               <i className="fas fa-times close" onClick={() => setVisible(false)}></i>
               {children}
           </div>
       </div>,
-      app
+      document.body
     );
 }
