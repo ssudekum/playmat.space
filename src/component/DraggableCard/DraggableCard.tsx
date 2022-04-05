@@ -2,14 +2,14 @@ import React, { MouseEvent, useContext, useEffect, useMemo } from 'react';
 import { DragSourceMonitor, useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
-import Draggable from '../../../lib/enum/Draggable';
-import PhysicalCard, { cardEquals, getCardImage, getCopyId } from '../../../lib/type/PhysicalCard';
-import { RootState } from '../../../redux';
-import { hideContextMenus } from '../../../redux/actions';
-import { BASE_VERTICAL_CARD_HEIGHT } from '../../../redux/reducers/CardSizeReducer';
-import ContextMenuTrigger from '../../ContextMenu/ContextMenuTrigger';
-import { PhysicalCardsDO } from '../../CustomDrag/CustomDragLayer';
-import { PlaymatContext } from '../Playmat';
+import Draggable from '../../lib/enum/Draggable';
+import PhysicalCard, { cardEquals, getCardImage, getCopyId } from '../../lib/type/PhysicalCard';
+import { RootState } from '../../redux';
+import { hideContextMenus } from '../../redux/actions';
+import { BASE_VERTICAL_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
+import ContextMenuTrigger from '../ContextMenu/ContextMenuTrigger';
+import { PhysicalCardsDO } from '../CustomDrag/CustomDragLayer';
+import { PlaymatContext } from '../Playmat/Playmat';
 import './DraggableCard.css';
 
 export type DraggableCardProps = {

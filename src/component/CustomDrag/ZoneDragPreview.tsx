@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import PhysicalCard from '../../lib/type/PhysicalCard';
 import { RootState } from '../../redux';
 import { BASE_VERTICAL_CARD_HEIGHT, BASE_VERTICAL_CARD_WIDTH } from '../../redux/reducers/CardSizeReducer';
-import '../Playmat/DraggableCard/DraggableCard.css';
+import '../DraggableCard/DraggableCard.css';
 
 export type ZoneDragPreviewProps = {
   cards: PhysicalCard[],

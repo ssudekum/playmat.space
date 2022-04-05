@@ -2,7 +2,7 @@ import React, { CSSProperties, FC } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux';
 import { BASE_VERTICAL_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
-import '../Playmat/DraggableCard/DraggableCard.css';
+import '../DraggableCard/DraggableCard.css';
 
 export type SingleCardDragPreviewProps = {
   src?: string,
