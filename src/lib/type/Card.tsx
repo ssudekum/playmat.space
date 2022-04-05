@@ -3,7 +3,7 @@
 
 import ImageURI from "./ImageURI";
 import Identifiable from "./Identifiable";
-import cardBack from "../image/mtg-card-back.png";
+import cardBack from "../../image/mtg-card-back.png";
 
 export const getCardImage = (card: Card, flipped?: boolean) => {
   if (card.card_faces) {

@@ -1,6 +1,7 @@
-.dragSelectBox {
+.dragSelect {
   border: 1px solid blue;
   background-color: lightskyblue;
   position: absolute;
   z-index: 1;
+  cursor: pointer;
 }

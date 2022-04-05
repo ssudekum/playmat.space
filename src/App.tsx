@@ -3,7 +3,7 @@ import './App.css';
 import './component/Modal/Modal.css'
 import Logo from './component/Logo/Logo';
 import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from "react-dnd-touch-backend";
 import '@fortawesome/fontawesome-free/css/all.css';
 import Playmat from './component/Playmat/Playmat';
 import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
@@ -26,9 +26,9 @@ const App: FC = () => {
         dispatch(setIsDragging(false));
       }}
     >
-      <DndProvider backend={HTML5Backend}>
-        <Playmat />
+      <DndProvider backend={TouchBackend} options={{enableMouseEvents: true}}>
         <CustomDragLayer />
+        <Playmat />
       </DndProvider>
 
       <Logo />

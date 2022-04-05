@@ -1,4 +1,4 @@
-import Identifiable from './Identifiable';
+import Identifiable from '../type/Identifiable';
 
 /**
  * This data structure is essentially an array of object, with an associated map based on the "id" property of those objects.

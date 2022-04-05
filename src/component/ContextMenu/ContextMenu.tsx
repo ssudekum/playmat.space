@@ -1,7 +1,7 @@
 import React, { createContext, FC, RefObject, useRef } from 'react';
 import './ContextMenu.css';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/reducers';
+import { RootState } from '../../redux';
 
 export type ContextMenuProps = {
   id: string;

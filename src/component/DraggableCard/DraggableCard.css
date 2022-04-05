@@ -1,4 +1,4 @@
-.playmat-card {
+.draggable-card {
   border-radius: 15px;
   position: absolute;
   cursor: pointer;
@@ -8,7 +8,7 @@
   user-select: none;
 }
 
-.playmat-card-preview {
+.draggable-card-preview {
   border-radius: 15px;
   position: absolute;
   cursor: pointer;

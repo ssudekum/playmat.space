@@ -1,8 +1,8 @@
 import React, { CSSProperties, FC } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/reducers';
-import { BASE_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
-import '../PlaymatCard/PlaymatCard.css';
+import { RootState } from '../../redux';
+import { BASE_VERTICAL_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
+import '../Playmat/DraggableCard/DraggableCard.css';
 
 export type SingleCardDragPreviewProps = {
   src?: string,
@@ -16,10 +16,10 @@ const SingleCardDragPreview: FC<SingleCardDragPreviewProps> = ({ src, style }) =
       src={src}
       style={{
         ...style,
-        height: `${BASE_CARD_HEIGHT * cardSize}px`
+        height: `${BASE_VERTICAL_CARD_HEIGHT * cardSize}px`
       }}
       alt="card-preview"
-      className='playmat-card-preview'>
+      className='draggable-card-preview'>
     </img>
   );
 };

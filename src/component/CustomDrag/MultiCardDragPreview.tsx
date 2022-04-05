@@ -1,46 +1,41 @@
 import React, {FC} from 'react'
 import { useSelector } from 'react-redux';
-import PhysicalCard, { getCardImage } from '../../lib/PhysicalCard';
-import { RootState } from '../../redux/reducers';
-import { BASE_CARD_HEIGHT, BASE_CARD_WIDTH } from '../../redux/reducers/CardSizeReducer';
-import '../PlaymatCard/PlaymatCard.css'
+import PhysicalCard, { getCardImage } from '../../lib/type/PhysicalCard';
+import { RootState } from '../../redux';
+import { BASE_VERTICAL_CARD_HEIGHT, BASE_VERTICAL_CARD_WIDTH } from '../../redux/reducers/CardSizeReducer';
+import '../Playmat/DraggableCard/DraggableCard.css'
 import SingleCardDragPreview from './SingleCardDragPreview';
 
 export type MultiCardDragPreviewProps = {
-  selectedCards: PhysicalCard[],
+  cards: PhysicalCard[],
   anchor: PhysicalCard
 };
 
-const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ selectedCards, anchor }) => {
+const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ cards, anchor }) => {
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
-
-  if (!selectedCards.length) {
-    return <></>;
-  }
-
   const relativeTapped = anchor.isTapped;
-  let relativeLeft = anchor.left;
-  let relativeTop = anchor.top;
+  let relativeTop = anchor.coordinate.y;
+  let relativeLeft = anchor.coordinate.x;
   if (relativeTapped) {
-    const elementId = `playmat-card_${anchor.card.id}_${anchor.copy}`;
-    const dimensions = document.getElementById(elementId)?.getBoundingClientRect();
-    if (!dimensions) {
-      throw Error(`Can't locate anchor card ${elementId} during drag`);
-    }
-
-    relativeLeft = relativeLeft - (dimensions.width - (BASE_CARD_WIDTH * cardSize)) / 2;
-    relativeTop = relativeTop - (dimensions.height - (BASE_CARD_HEIGHT * cardSize)) / 2;
+    relativeLeft = relativeLeft - (
+      (BASE_VERTICAL_CARD_HEIGHT * cardSize) -
+      (BASE_VERTICAL_CARD_WIDTH * cardSize)
+    ) / 2;
+    relativeTop = relativeTop - (
+      (BASE_VERTICAL_CARD_WIDTH * cardSize) -
+      (BASE_VERTICAL_CARD_HEIGHT * cardSize)
+    ) / 2;
   }
 
-  const previews = selectedCards.map((selected, i) => {
+  const previews = cards.map((card, i) => {
     return (
       <SingleCardDragPreview
         key={i}
-        src={getCardImage(selected)}
+        src={getCardImage(card)}
         style={{
-          left: selected.left - relativeLeft,
-          top: selected.top - relativeTop,
-          transform: selected.isTapped ? 'rotate(90deg)' : ''
+          top: card.coordinate.y - relativeTop,
+          left: card.coordinate.x - relativeLeft,
+          transform: card.isTapped ? 'rotate(90deg)' : ''
         }}>
       </SingleCardDragPreview>
     );

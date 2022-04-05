@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
-import { Modal, ModalProps } from '../../Modal/Modal';
-import CountedCollection from '../../../lib/CountedCollection';
-import Card from '../../../lib/Card';
+import { Modal, ModalProps } from '../Modal';
+import CountedCollection from '../../../lib/class/CountedCollection';
+import Card from '../../../lib/type/Card';
 
 type ImportModalProps = ModalProps & {
   onImport: (cards: CountedCollection<Card>) => void

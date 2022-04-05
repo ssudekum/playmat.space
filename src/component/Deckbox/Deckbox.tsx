@@ -1,16 +1,17 @@
 import React, { FC, useState } from 'react'
-import Card from '../../lib/Card';
-import CountedCollection from '../../lib/CountedCollection';
-import Decklist from './Decklist/Decklist';
-import ImportModal from './ImportModal/ImportModal';
-import CardSearch from './CardSearch/CardSearch';
+import Card from '../../lib/type/Card';
+import CountedCollection from '../../lib/class/CountedCollection';
+import Decklist from '../Decklist/Decklist';
+import ImportModal from '../Modal/ImportModal/ImportModal';
+import CardSearch from '../CardSearch/CardSearch';
 import './Deckbox.css'
+import CardLocation from '../../lib/enum/CardLocation';
 
 type DeckboxProps = {
-  addCollection: (cards: CountedCollection<Card>) => void
+  addCards: (cards: CountedCollection<Card>, cardLocation: CardLocation) => void
 };
 
-const Deckbox: FC<DeckboxProps> = ({ addCollection }) => {
+const Deckbox: FC<DeckboxProps> = ({ addCards }) => {
   const [isDeckboxVisible, setIsDeckboxVisible] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [cards, setCards] = useState<CountedCollection<Card>>(new CountedCollection());
@@ -50,7 +51,8 @@ const Deckbox: FC<DeckboxProps> = ({ addCollection }) => {
           <button
             className="button" 
             disabled={cards.getTotalCount() === 0 ? true : false} 
-            onClick={() => addCollection(cards)}>
+            onClick={() => addCards(cards, CardLocation.PLAYMAT)}
+          >
             Add to Playmat
           </button>
 

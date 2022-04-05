@@ -1,7 +1,8 @@
 import { ReducerAction, ReducerActionType } from "../actions";
 
-export const BASE_CARD_HEIGHT = 300;
-export const BASE_CARD_WIDTH = 214;
+export const BASE_VERTICAL_CARD_HEIGHT = 300;
+export const BASE_VERTICAL_CARD_WIDTH = 215;
+
 export type CardSizeStore = {
   size: number;
 };
