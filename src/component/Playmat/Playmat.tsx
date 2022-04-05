@@ -12,10 +12,10 @@ import DraggableCard from '../DraggableCard/DraggableCard';
 import Zone, { ZoneProps } from '../Zone/Zone';
 import { isZoneDO, ZoneDO } from '../DragPreview/CustomDragLayer';
 import useCardContext, { defaultContext, getCardContext } from '../../lib/hook/useCardContext';
-import CardDropHandler, { CardDO } from "../../lib/class/CardDropHandler";
+import { CardDO } from "../../lib/class/CardDropHandler";
 import DragSelect, { isSelected } from '../DragSelect/DragSelect';
 import useDragSelect from '../DragSelect/useDragSelect';
-import PlaymatContextMenu from './PlaymatContextMenu';
+import PlaymatContextMenu from '../ContextMenu/PlaymatContextMenu';
 import playmatImage from '../../image/goyf-playmat.jpg'
 import './Playmat.css';
 
@@ -30,10 +30,10 @@ if (playmatImage) {
   }
 }
 
-export const PlaymatContext = getCardContext();
+export const PlaymatCardContext = getCardContext();
 
 const Playmat: FC = () => {
-  const playmatContext = useCardContext("playmat");
+  const { context, handler } = useCardContext("playmat");
   const {
     cardStack,
     selectedCards,
@@ -42,7 +42,7 @@ const Playmat: FC = () => {
     isDraggingSelection,
     addCards,
     setCardState,
-  } = playmatContext;
+  } = context;
   const [onMouseDown, onMouseMove] = useDragSelect();
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   const [zoneData, setZoneData] = useState<ZoneProps[]>([
@@ -96,16 +96,16 @@ const Playmat: FC = () => {
     setZoneData(nextZoneData);
   };
 
-  const cards = useMemo(() => (
-    playmatContext.cardStack.map((physicalCard, index) => (
+  const cards = useMemo(() => {
+    return context.cardStack.map((physicalCard, index) => (
       <DraggableCard
         key={`${physicalCard.card.id}-${physicalCard.copy}`}
-        cardContext={playmatContext}
+        cardContext={context}
         zIndex={index + 2}
         draggableCard={physicalCard}
       />
-    ))
-  ), [playmatContext]);
+    ));
+  }, [context]);
 
   const zones = useMemo(() => (
     zoneData.map((zone) => (
@@ -123,17 +123,16 @@ const Playmat: FC = () => {
         if (isZoneDO(dropped)) {
           dropZone(dropped, monitor);
         } else {
-          const handler = new CardDropHandler(playmatContext);
           handler.drop(dropped, monitor);
         }
         return dropped;
       }
     },
-  }, [playmatContext]);
+  }, [handler]);
 
   return (<>
     <Deckbox addCards={addCards}/>
-    <PlaymatContext.Provider value={{
+    <PlaymatCardContext.Provider value={{
       ...defaultContext,
       cardStack,
       selectedCards,
@@ -155,7 +154,7 @@ const Playmat: FC = () => {
         {cards}
         {zones}
       </div>
-    </PlaymatContext.Provider>
+    </PlaymatCardContext.Provider>
   </>);
 }
 

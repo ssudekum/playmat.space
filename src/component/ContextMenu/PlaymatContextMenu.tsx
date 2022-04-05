@@ -1,8 +1,8 @@
 import React, { FC, useContext } from "react";
 import CountedCollection from "../../lib/class/CountedCollection";
-import ContextMenu from "../ContextMenu/ContextMenu";
-import ContextOption from "../ContextMenu/ContextOption";
-import { PlaymatContext } from "./Playmat";
+import ContextMenu from "./ContextMenu";
+import ContextOption from "./ContextOption";
+import { PlaymatCardContext } from "../Playmat/Playmat";
 
 const PlaymatContextMenu: FC = () => {
   const {
@@ -10,7 +10,7 @@ const PlaymatContextMenu: FC = () => {
     selectedCards,
     cardCollection,
     setCardState,
-  } = useContext(PlaymatContext);
+  } = useContext(PlaymatCardContext);
 
   const flip = () => {
     let nextSelectedCards = [...selectedCards];

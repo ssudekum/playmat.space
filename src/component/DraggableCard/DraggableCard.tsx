@@ -39,25 +39,18 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   >({
     type: Draggable.PHYSICAL_CARDS,
     item: (): PhysicalCardsDO => {
-      const draggedCards = [...selectedCards]; 
-      draggedCards.forEach((card) => {
-        card.sourceContextId = cardContext.contextId;
-        card.currentContextId = undefined;
-      });
+      console.log(draggableCard);
       return {
         type: Draggable.PHYSICAL_CARDS,
         cards: selectedCards,
         anchor: draggableCard,
+        sourceContextId: cardContext.contextId,
+        sourceContextRemoval: cardContext.removeCards,
       };
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    end: () => {
-      if (draggableCard.currentContextId !== draggableCard.sourceContextId) {
-        cardContext.removeCards([draggableCard]);
-      }
-    }
   });
 
   useEffect(() => {
@@ -122,7 +115,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
 
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
-    <ContextMenuTrigger id={`${copyId}-menu`} zIndex={zIndex}>
+    <ContextMenuTrigger id={`${cardContext.contextId}-menu`} zIndex={zIndex}>
       <img
         id={copyId}
         ref={drag}

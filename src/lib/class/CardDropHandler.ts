@@ -2,7 +2,7 @@ import { DropTargetMonitor } from "react-dnd";
 import Card from "../type/Card";
 import PhysicalCard, { cardEquals, isPhysicalCard } from "../type/PhysicalCard";
 import CountedCollection from "./CountedCollection";
-import { CardsDO, PhysicalCardsDO } from "../../component/DragPreview/CustomDragLayer";
+import { CardsDO, isPhysicalCardsDO, PhysicalCardsDO } from "../../component/DragPreview/CustomDragLayer";
 import { CardContext } from "../hook/useCardContext";
 
 export type CardDO = CardsDO | PhysicalCardsDO;
@@ -23,8 +23,12 @@ export default class CardDropHandler {
   drop(dropped: CardDO, target: DropTargetMonitor) {
     const newPhysicalCards: PhysicalCard[] = [];
     dropped.cards.forEach((card: Card | PhysicalCard) => this.dropCard(card, target, newPhysicalCards));
+    
     if (newPhysicalCards.length) {
       this.nextSelectedCards = newPhysicalCards;
+    }
+    if (isPhysicalCardsDO(dropped) && dropped.sourceContextId !== this.context.contextId) {
+      dropped.sourceContextRemoval(dropped.cards);
     }
 
     this.context.setCardState({
@@ -64,14 +68,17 @@ export default class CardDropHandler {
   };
 
   private createPhysicalCard(card: Card, target: DropTargetMonitor): PhysicalCard {
-    const offset = target.getSourceClientOffset();
-    const offsetX = offset?.x ?? document.body.clientWidth / 2;
-    const offsetY = offset?.y ?? document.body.clientHeight / 2;
-    this.nextCardCollection.addOne(card);
+    let offsetX = 0;
+    let offsetY = 0;
+    if (this.context.contextId === 'playmat') {
+      const offset = target.getSourceClientOffset();
+      offsetX = offset?.x ?? document.body.clientWidth / 2;
+      offsetY = offset?.y ?? document.body.clientHeight / 2;
+      this.nextCardCollection.addOne(card);
+    }
 
     return {
       card: card,
-      currentContextId: this.context.contextId,
       copy: this.nextCardCollection.counts[card.id],
       coordinate: {
         x: offsetX,
@@ -85,9 +92,14 @@ export default class CardDropHandler {
     selectedIndex: number,
     target: DropTargetMonitor,
   ): PhysicalCard {
-    const offset = target.getDifferenceFromInitialOffset();
-    const offsetX = offset?.x ?? document.body.clientWidth / 2;
-    const offsetY = offset?.y ?? document.body.clientHeight / 2;
+    let offsetX = 0;
+    let offsetY = 0;
+    if (this.context.contextId === 'playmat') {
+      const offset = target.getDifferenceFromInitialOffset();
+      offsetX = offset?.x ?? document.body.clientWidth / 2;
+      offsetY = offset?.y ?? document.body.clientHeight / 2;
+    }
+    
     const stackCard = this.nextCardStack.splice(stackIndex, 1)[0];
     if (selectedIndex !== -1) {
       this.nextSelectedCards.splice(selectedIndex, 1);
@@ -95,7 +107,6 @@ export default class CardDropHandler {
   
     return {
       ...stackCard,
-      currentContextId: this.context.contextId,
       coordinate: {
         x: stackCard.coordinate.x + offsetX,
         y: stackCard.coordinate.y + offsetY,

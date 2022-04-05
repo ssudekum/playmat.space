@@ -2,6 +2,7 @@ import React, { useEffect, createContext, useReducer, Reducer } from 'react'
 import Card from '../type/Card';
 import PhysicalCard, { cardEquals } from '../type/PhysicalCard';
 import CountedCollection from '../class/CountedCollection';
+import CardDropHandler from '../class/CardDropHandler';
 
 type CardState = {
   contextId: string,
@@ -36,7 +37,7 @@ export const defaultContext = {
 
 export const getCardContext = () => createContext<CardContext>(defaultContext);
 
-const useCardContext = (id: string): CardContext => {
+const useCardContext = (id: string): { context: CardContext, handler: CardDropHandler } => {
   const [state, setState] = useReducer<Reducer<CardState, Partial<CardState>>>(
     (state, newState) => ({...state, ...newState}), 
     defaultState
@@ -59,7 +60,6 @@ const useCardContext = (id: string): CardContext => {
         nextCardCollection.addOne(card);
         nextCardStack.push({
           card,
-          currentContextId: id,
           copy: nextCardCollection.counts[card.id],
           coordinate: {
             x: document.body.clientWidth / 2,
@@ -109,7 +109,7 @@ const useCardContext = (id: string): CardContext => {
     };
   }, [cardStack, selectedCards, cardCollection]);
 
-  return {
+  const thisContext: CardContext = {
     contextId: id,
     cardStack,
     selectedCards,
@@ -119,6 +119,11 @@ const useCardContext = (id: string): CardContext => {
     addCards,
     removeCards,
     setCardState: setState
+  };
+
+  return {
+    context: thisContext,
+    handler: new CardDropHandler(thisContext),
   };
 }
 

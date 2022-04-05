@@ -7,12 +7,13 @@ import { BASE_VERTICAL_CARD_HEIGHT, BASE_VERTICAL_CARD_WIDTH } from "../../redux
 import Draggable from "../../lib/enum/Draggable";
 import { getCopyId } from "../../lib/type/PhysicalCard";
 import { Position } from '../../lib/type/Spatial';
-import CardDropHandler, { CardDO } from "../../lib/class/CardDropHandler";
+import { CardDO } from "../../lib/class/CardDropHandler";
 import DraggableCard from "../DraggableCard/DraggableCard";
 import useCardContext, { defaultContext, getCardContext } from "../../lib/hook/useCardContext";
 import "./Zone.css";
+import { isPhysicalCardsDO } from "../DragPreview/CustomDragLayer";
 
-export const ZoneContext = getCardContext();
+export const ZoneCardContext = getCardContext();
 
 export type ZoneProps = {
   label: string, // unique
@@ -20,43 +21,36 @@ export type ZoneProps = {
 };
 
 const Zone: FC<ZoneProps> = ({ label, position }) => {
-  const zoneContext = useCardContext(`${label.toLowerCase()}-zone`);
+  const { context, handler }  = useCardContext(`${label.toLowerCase()}-zone`);
   const {
     cardStack,
     selectedCards,
     cardCollection,
     removeCards,
     setCardState,
-  } = zoneContext;
+  } = context;
 
   const cards = useMemo(() => (
-    zoneContext.cardStack
-      .map((draggableCard, index) => (
+    context.cardStack
+      .map((card, index) => (
         <DraggableCard
-          key={getCopyId(draggableCard)}
-          cardContext={zoneContext}
+          key={getCopyId(card)}
+          cardContext={context}
           zIndex={index + 2}
-          draggableCard={{
-            ...draggableCard,
-            coordinate: {
-              x: 0,
-              y: 10 * index,
-            }
-          }}
+          draggableCard={card}
         />
       ))
-  ), [zoneContext]);
+  ), [context]);
 
   const [,drop] = useDrop({
     accept: [Draggable.PHYSICAL_CARDS, Draggable.TEXT_CARDS],
     drop: (dropped: CardDO, monitor: DropTargetMonitor) => {
       if (!monitor.didDrop()) {
-        const handler = new CardDropHandler(zoneContext);
         handler.drop(dropped, monitor);
         return dropped;
       }
     },
-  }, [zoneContext]);
+  }, [handler]);
 
   const [{isDragging}, drag, preview] = useDrag({
     type: Draggable.ZONE,
@@ -82,7 +76,7 @@ const Zone: FC<ZoneProps> = ({ label, position }) => {
 
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
-    <ZoneContext.Provider value={{
+    <ZoneCardContext.Provider value={{
       ...defaultContext,
       cardStack,
       selectedCards,
@@ -110,7 +104,7 @@ const Zone: FC<ZoneProps> = ({ label, position }) => {
           {cards}
         </div>
       </div>
-    </ZoneContext.Provider>
+    </ZoneCardContext.Provider>
   );
 };
 

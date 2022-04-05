@@ -13,19 +13,24 @@ export type DragObjectWithType = {
 }
 
 export type CardsDO = DragObjectWithType & {
-  cards: Card[]
+  cards: Card[];
 };
 
 export type PhysicalCardsDO = DragObjectWithType & {
-  cards: PhysicalCard[]
-  anchor: PhysicalCard
+  cards: PhysicalCard[];
+  anchor: PhysicalCard;
+  sourceContextId: string;
+  sourceContextRemoval: (cards: PhysicalCard[]) => void
 };
 
 export type ZoneDO = DragObjectWithType & {
-  cards: PhysicalCard[],
-  label: string,
-  position: Position,
+  cards: PhysicalCard[];
+  label: string;
+  position: Position;
 };
+
+export const isPhysicalCardsDO = (dropped: DragObjectWithType): dropped is PhysicalCardsDO =>
+  (dropped as PhysicalCardsDO).type === Draggable.PHYSICAL_CARDS;
 
 export const isZoneDO = (dropped: DragObjectWithType): dropped is ZoneDO =>
   (dropped as ZoneDO).type === Draggable.ZONE;

@@ -28,6 +28,9 @@ const MultiCardDragPreview: FC<MultiCardDragPreviewProps> = ({ cards, anchor }) 
   }
 
   const previews = cards.map((card, i) => {
+    console.log(card.coordinate);
+    console.log(relativeTop);
+    console.log(relativeLeft);
     return (
       <SingleCardDragPreview
         key={i}
