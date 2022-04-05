@@ -5,10 +5,9 @@ import Decklist from '../Decklist/Decklist';
 import ImportModal from '../Modal/ImportModal/ImportModal';
 import CardSearch from '../CardSearch/CardSearch';
 import './Deckbox.css'
-import CardLocation from '../../lib/enum/CardLocation';
 
 type DeckboxProps = {
-  addCards: (cards: CountedCollection<Card>, cardLocation: CardLocation) => void
+  addCards: (cards: CountedCollection<Card>) => void
 };
 
 const Deckbox: FC<DeckboxProps> = ({ addCards }) => {
@@ -51,7 +50,7 @@ const Deckbox: FC<DeckboxProps> = ({ addCards }) => {
           <button
             className="button" 
             disabled={cards.getTotalCount() === 0 ? true : false} 
-            onClick={() => addCards(cards, CardLocation.PLAYMAT)}
+            onClick={() => addCards(cards)}
           >
             Add to Playmat
           </button>

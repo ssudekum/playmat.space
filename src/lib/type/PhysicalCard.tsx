@@ -1,4 +1,3 @@
-import CardLocation from "../enum/CardLocation";
 import Card, {getCardImage as getImage} from "./Card";
 import { Coordinate } from "./Spatial";
 
@@ -6,8 +5,8 @@ type PhysicalCard = {
   card: Card;
   copy: number;
   coordinate: Coordinate;
-  currentLocation?: CardLocation;
-  sourceLocation?: CardLocation;
+  sourceContextId?: string;
+  currentContextId?: string;
   isTapped?: boolean;
   isFlipped?: boolean;
 };

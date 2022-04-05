@@ -7,70 +7,56 @@ import { BASE_VERTICAL_CARD_HEIGHT, BASE_VERTICAL_CARD_WIDTH } from "../../redux
 import Draggable from "../../lib/enum/Draggable";
 import { getCopyId } from "../../lib/type/PhysicalCard";
 import { Position } from '../../lib/type/Spatial';
-import CardDropHandler, { CardDO } from "../Playmat/CardDropHandler";
-import useCards, { defaultContext, getCardContext } from "../DraggableCard/useCards";
+import CardDropHandler, { CardDO } from "../../lib/class/CardDropHandler";
 import DraggableCard from "../DraggableCard/DraggableCard";
-import CardLocation from "../../lib/enum/CardLocation";
+import useCardContext, { defaultContext, getCardContext } from "../../lib/hook/useCardContext";
 import "./Zone.css";
 
 export const ZoneContext = getCardContext();
 
 export type ZoneProps = {
-  label: string,
+  label: string, // unique
   position: Position
 };
 
 const Zone: FC<ZoneProps> = ({ label, position }) => {
-  const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
+  const zoneContext = useCardContext(`${label.toLowerCase()}-zone`);
   const {
     cardStack,
     selectedCards,
     cardCollection,
     removeCards,
     setCardState,
-  } = useCards();
+  } = zoneContext;
 
   const cards = useMemo(() => (
-    cardStack.map((draggableCard, index) => (
-      <DraggableCard
-        key={getCopyId(draggableCard)}
-        zIndex={index + 2}
-        draggableCard={{
-          ...draggableCard,
-          coordinate: {
-            x: 0,
-            y: 10 * index,
-          }
-        }}
-      />
-    ))
-  ), [cardStack]);
+    zoneContext.cardStack
+      .map((draggableCard, index) => (
+        <DraggableCard
+          key={getCopyId(draggableCard)}
+          cardContext={zoneContext}
+          zIndex={index + 2}
+          draggableCard={{
+            ...draggableCard,
+            coordinate: {
+              x: 0,
+              y: 10 * index,
+            }
+          }}
+        />
+      ))
+  ), [zoneContext]);
 
   const [,drop] = useDrop({
     accept: [Draggable.PHYSICAL_CARDS, Draggable.TEXT_CARDS],
     drop: (dropped: CardDO, monitor: DropTargetMonitor) => {
       if (!monitor.didDrop()) {
-        console.log('zone');
-        const handler = new CardDropHandler(
-          cardStack,
-          selectedCards,
-          cardCollection,
-          CardLocation.ZONE,
-        );
-
+        const handler = new CardDropHandler(zoneContext);
         handler.drop(dropped, monitor);
-        setCardState({
-          cardStack: handler.cardStack,
-          selectedCards: handler.selectedCards,
-          cardCollection: handler.cardCollection,
-        });
-
-        console.log(handler);
         return dropped;
       }
-      console.log('skipped dropping on zone');
     },
-  });
+  }, [zoneContext]);
 
   const [{isDragging}, drag, preview] = useDrag({
     type: Draggable.ZONE,
@@ -94,6 +80,7 @@ const Zone: FC<ZoneProps> = ({ label, position }) => {
     classNames.push('hidden');
   }
 
+  const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
     <ZoneContext.Provider value={{
       ...defaultContext,

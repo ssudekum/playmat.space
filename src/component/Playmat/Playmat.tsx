@@ -10,15 +10,14 @@ import Draggable from '../../lib/enum/Draggable';
 import Deckbox from '../Deckbox/Deckbox';
 import DraggableCard from '../DraggableCard/DraggableCard';
 import Zone, { ZoneProps } from '../Zone/Zone';
-import { isZoneDO, ZoneDO } from '../CustomDrag/CustomDragLayer';
-import useCards, { defaultContext, getCardContext } from '../DraggableCard/useCards';
-import CardDropHandler, { CardDO } from "./CardDropHandler";
+import { isZoneDO, ZoneDO } from '../DragPreview/CustomDragLayer';
+import useCardContext, { defaultContext, getCardContext } from '../../lib/hook/useCardContext';
+import CardDropHandler, { CardDO } from "../../lib/class/CardDropHandler";
 import DragSelect, { isSelected } from '../DragSelect/DragSelect';
 import useDragSelect from '../DragSelect/useDragSelect';
 import PlaymatContextMenu from './PlaymatContextMenu';
 import playmatImage from '../../image/goyf-playmat.jpg'
 import './Playmat.css';
-import CardLocation from '../../lib/enum/CardLocation';
 
 let playmatStyle: CSSProperties = {
   userSelect: 'none'
@@ -34,6 +33,7 @@ if (playmatImage) {
 export const PlaymatContext = getCardContext();
 
 const Playmat: FC = () => {
+  const playmatContext = useCardContext("playmat");
   const {
     cardStack,
     selectedCards,
@@ -42,7 +42,7 @@ const Playmat: FC = () => {
     isDraggingSelection,
     addCards,
     setCardState,
-  } = useCards();
+  } = playmatContext;
   const [onMouseDown, onMouseMove] = useDragSelect();
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   const [zoneData, setZoneData] = useState<ZoneProps[]>([
@@ -96,19 +96,16 @@ const Playmat: FC = () => {
     setZoneData(nextZoneData);
   };
 
-  const cards = useMemo(() => {
-    console.log(cardStack);
-    const draggableCards = cardStack
-      .filter((physicalCard) => physicalCard.currentLocation === CardLocation.PLAYMAT)
-      .map((physicalCard, index) => (
-        <DraggableCard
-          key={`${physicalCard.card.id}-${physicalCard.copy}`}
-          zIndex={index + 2}
-          draggableCard={physicalCard}
-        />
-      ));
-    return draggableCards;
-  }, [cardStack]);
+  const cards = useMemo(() => (
+    playmatContext.cardStack.map((physicalCard, index) => (
+      <DraggableCard
+        key={`${physicalCard.card.id}-${physicalCard.copy}`}
+        cardContext={playmatContext}
+        zIndex={index + 2}
+        draggableCard={physicalCard}
+      />
+    ))
+  ), [playmatContext]);
 
   const zones = useMemo(() => (
     zoneData.map((zone) => (
@@ -123,30 +120,16 @@ const Playmat: FC = () => {
     accept: [Draggable.PHYSICAL_CARDS, Draggable.TEXT_CARDS, Draggable.ZONE],
     drop: (dropped: CardDO | ZoneDO, monitor: DropTargetMonitor) => {
       if (!monitor.didDrop()) {
-        console.log('playmat');
         if (isZoneDO(dropped)) {
           dropZone(dropped, monitor);
         } else {
-          const handler = new CardDropHandler(
-            cardStack,
-            selectedCards,
-            cardCollection,
-            CardLocation.PLAYMAT,
-          );
+          const handler = new CardDropHandler(playmatContext);
           handler.drop(dropped, monitor);
-          setCardState({
-            cardStack: handler.cardStack,
-            selectedCards: handler.selectedCards,
-            cardCollection: handler.cardCollection,
-          });
-          console.log(handler);
         }
-        
         return dropped;
       }
-      console.log('skipped dropping on playmat');
     },
-  });
+  }, [playmatContext]);
 
   return (<>
     <Deckbox addCards={addCards}/>

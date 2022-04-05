@@ -2,7 +2,7 @@ import React, { FC, useMemo } from 'react';
 import './Decklist.css';
 import Card from '../../lib/type/Card';
 import CountedCollection from '../../lib/class/CountedCollection';
-import TextCard from '../TextCard/TextCard';
+import DraggableTextCard from '../DraggableTextCard/DraggableTextCard';
 import Table, { TableColumn } from '../Table/Table';
 
 type TableProps = {
@@ -18,9 +18,7 @@ const baseColumns = [
   {
     label: 'Name',
     field: 'name',
-    formatter: (_name: string, card: Card) => (
-      <TextCard card={card}></TextCard>
-    )
+    formatter: (_name: string, card: Card) => <DraggableTextCard card={card} />
   },
   {
     label: 'Type',

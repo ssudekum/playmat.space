@@ -6,7 +6,7 @@ import { DndProvider } from 'react-dnd';
 import { TouchBackend } from "react-dnd-touch-backend";
 import '@fortawesome/fontawesome-free/css/all.css';
 import Playmat from './component/Playmat/Playmat';
-import { CustomDragLayer } from './component/CustomDrag/CustomDragLayer';
+import { CustomDragLayer } from './component/DragPreview/CustomDragLayer';
 import SettingsButton from './component/Settings/SettingsButton';
 import { useDispatch } from 'react-redux';
 import { decreaseCardSize, hideContextMenus, increaseCardSize, setIsDragging } from './redux/actions';

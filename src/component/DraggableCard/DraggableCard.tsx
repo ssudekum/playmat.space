@@ -1,5 +1,5 @@
-import React, { MouseEvent, useContext, useEffect, useMemo } from 'react';
-import { DragSourceMonitor, useDrag } from 'react-dnd';
+import React, { MouseEvent, useEffect, useMemo } from 'react';
+import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import Draggable from '../../lib/enum/Draggable';
@@ -8,46 +8,56 @@ import { RootState } from '../../redux';
 import { hideContextMenus } from '../../redux/actions';
 import { BASE_VERTICAL_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
 import ContextMenuTrigger from '../ContextMenu/ContextMenuTrigger';
-import { PhysicalCardsDO } from '../CustomDrag/CustomDragLayer';
-import { PlaymatContext } from '../Playmat/Playmat';
+import { CardContext } from '../../lib/hook/useCardContext';
 import './DraggableCard.css';
+import { PhysicalCardsDO } from '../DragPreview/CustomDragLayer';
 
 export type DraggableCardProps = {
   zIndex: number,
   draggableCard: PhysicalCard,
+  cardContext: CardContext,
 };
 
 const DraggableCard: React.FC<DraggableCardProps> = ({
   zIndex,
   draggableCard,
+  cardContext,
 }) => {
   const dispatch = useDispatch();
-
+  const copyId = getCopyId(draggableCard);
   const {
     selectedCards,
     isAnimationAllowed,
     isDraggingSelection,
     setCardState,
-  } = useContext(PlaymatContext);
+  } = cardContext;
 
-  const [{isDragging}, drag, preview] = useDrag({
+  const [{isDragging}, drag, preview] = useDrag<
+    PhysicalCardsDO, 
+    PhysicalCardsDO, 
+    { isDragging: boolean }
+  >({
     type: Draggable.PHYSICAL_CARDS,
     item: (): PhysicalCardsDO => {
       const draggedCards = [...selectedCards]; 
       draggedCards.forEach((card) => {
-        card.sourceLocation = card.currentLocation;
-        card.currentLocation = undefined;
+        card.sourceContextId = cardContext.contextId;
+        card.currentContextId = undefined;
       });
-      console.log(draggedCards);
       return {
         type: Draggable.PHYSICAL_CARDS,
-        cards: draggedCards,
+        cards: selectedCards,
         anchor: draggableCard,
       };
     },
-    collect: (monitor: DragSourceMonitor) => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    end: () => {
+      if (draggableCard.currentContextId !== draggableCard.sourceContextId) {
+        cardContext.removeCards([draggableCard]);
+      }
+    }
   });
 
   useEffect(() => {
@@ -112,9 +122,9 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
 
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
-    <ContextMenuTrigger id={`${draggableCard.currentLocation}-menu`} zIndex={zIndex}>
+    <ContextMenuTrigger id={`${copyId}-menu`} zIndex={zIndex}>
       <img
-        id={getCopyId(draggableCard)}
+        id={copyId}
         ref={drag}
         loading="eager"
         decoding="async"

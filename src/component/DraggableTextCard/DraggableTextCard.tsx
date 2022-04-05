@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
-import { useDrag } from 'react-dnd';
-import './TextCard.css';
-import Card, { getCardImage } from '../../lib/type/Card';
-import Tooltip from 'react-tooltip';
-import Draggable from '../../lib/enum/Draggable';
-import { getEmptyImage } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom';
+import { useDrag } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend'
+import Tooltip from 'react-tooltip';
+import Card, { getCardImage } from '../../lib/type/Card';
+import Draggable from '../../lib/enum/Draggable';
+import './DraggableTextCard.css';
 
-type TextCardProps = {
+type DraggableTextCardProps = {
   card: Card
 };
 
-const TextCard: React.FC<TextCardProps> = ({ card }) => {
+const DraggableTextCard: React.FC<DraggableTextCardProps> = ({ card }) => {
   const [{ isDragging }, drag, preview] = useDrag({
     type: Draggable.TEXT_CARDS,
     item: { type: Draggable.TEXT_CARDS, cards: [card] },
@@ -66,4 +66,4 @@ const TextCard: React.FC<TextCardProps> = ({ card }) => {
   );
 }
 
-export default TextCard;
+export default DraggableTextCard;

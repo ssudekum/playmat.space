@@ -1,10 +1,10 @@
 import React, { useEffect, createContext, useReducer, Reducer } from 'react'
-import Card from '../../lib/type/Card';
-import PhysicalCard, { cardEquals } from '../../lib/type/PhysicalCard';
-import CountedCollection from '../../lib/class/CountedCollection';
-import CardLocation from '../../lib/enum/CardLocation';
+import Card from '../type/Card';
+import PhysicalCard, { cardEquals } from '../type/PhysicalCard';
+import CountedCollection from '../class/CountedCollection';
 
 type CardState = {
+  contextId: string,
   cardStack: PhysicalCard[],
   selectedCards: PhysicalCard[],
   cardCollection: CountedCollection<Card>,
@@ -13,6 +13,7 @@ type CardState = {
 };
 
 const defaultState = {
+  contextId: "",
   cardStack: [],
   selectedCards: [],
   cardCollection: new CountedCollection<Card>(),
@@ -35,7 +36,7 @@ export const defaultContext = {
 
 export const getCardContext = () => createContext<CardContext>(defaultContext);
 
-const useCards = () => {
+const useCardContext = (id: string): CardContext => {
   const [state, setState] = useReducer<Reducer<CardState, Partial<CardState>>>(
     (state, newState) => ({...state, ...newState}), 
     defaultState
@@ -49,7 +50,7 @@ const useCards = () => {
     isDraggingSelection,
   } = state;
 
-  const addCards = (adds: CountedCollection<Card>, cardLocation: CardLocation) => {
+  const addCards = (adds: CountedCollection<Card>) => {
     const nextCardCollection = new CountedCollection(cardCollection);
     const nextCardStack = [...cardStack];
     for (const card of Object.values(adds.items)) {
@@ -58,7 +59,7 @@ const useCards = () => {
         nextCardCollection.addOne(card);
         nextCardStack.push({
           card,
-          currentLocation: cardLocation,
+          currentContextId: id,
           copy: nextCardCollection.counts[card.id],
           coordinate: {
             x: document.body.clientWidth / 2,
@@ -109,6 +110,7 @@ const useCards = () => {
   }, [cardStack, selectedCards, cardCollection]);
 
   return {
+    contextId: id,
     cardStack,
     selectedCards,
     cardCollection,
@@ -120,4 +122,4 @@ const useCards = () => {
   };
 }
 
-export default useCards;
+export default useCardContext;
