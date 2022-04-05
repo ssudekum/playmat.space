@@ -9,9 +9,8 @@ import { getCopyId } from "../../lib/type/PhysicalCard";
 import { Position } from '../../lib/type/Spatial';
 import { CardDO } from "../../lib/class/CardDropHandler";
 import DraggableCard from "../DraggableCard/DraggableCard";
-import useCardContext, { defaultContext, getCardContext } from "../../lib/hook/useCardContext";
+import useCardContext, { defaultCardContext, getCardContext } from "../../lib/hook/useCardContext";
 import "./Zone.css";
-import { isPhysicalCardsDO } from "../DragPreview/CustomDragLayer";
 
 export const ZoneCardContext = getCardContext();
 
@@ -77,7 +76,7 @@ const Zone: FC<ZoneProps> = ({ label, position }) => {
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
     <ZoneCardContext.Provider value={{
-      ...defaultContext,
+      ...defaultCardContext,
       cardStack,
       selectedCards,
       cardCollection,

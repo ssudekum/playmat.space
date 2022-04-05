@@ -11,7 +11,7 @@ import Deckbox from '../Deckbox/Deckbox';
 import DraggableCard from '../DraggableCard/DraggableCard';
 import Zone, { ZoneProps } from '../Zone/Zone';
 import { isZoneDO, ZoneDO } from '../DragPreview/CustomDragLayer';
-import useCardContext, { defaultContext, getCardContext } from '../../lib/hook/useCardContext';
+import useCardContext, { defaultCardContext, getCardContext } from '../../lib/hook/useCardContext';
 import { CardDO } from "../../lib/class/CardDropHandler";
 import DragSelect, { isSelected } from '../DragSelect/DragSelect';
 import useDragSelect from '../DragSelect/useDragSelect';
@@ -133,7 +133,7 @@ const Playmat: FC = () => {
   return (<>
     <Deckbox addCards={addCards}/>
     <PlaymatCardContext.Provider value={{
-      ...defaultContext,
+      ...defaultCardContext,
       cardStack,
       selectedCards,
       cardCollection,

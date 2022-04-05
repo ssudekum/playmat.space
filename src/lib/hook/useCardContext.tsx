@@ -28,14 +28,14 @@ export type CardContext = CardState & {
 
 const notImplemented = (name: string) => console.log(`${name} not implemented`);
 
-export const defaultContext = {
+export const defaultCardContext = {
   ...defaultState,
   addCards: () => notImplemented("addCards"),
   removeCards: () => notImplemented("removeCards"),
   setCardState: () => notImplemented("setCardState"),
 };
 
-export const getCardContext = () => createContext<CardContext>(defaultContext);
+export const getCardContext = () => createContext<CardContext>(defaultCardContext);
 
 const useCardContext = (id: string): { context: CardContext, handler: CardDropHandler } => {
   const [state, setState] = useReducer<Reducer<CardState, Partial<CardState>>>(
