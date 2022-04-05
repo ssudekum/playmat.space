@@ -1,15 +1,10 @@
 import { Coordinate } from "../../lib/type/Spatial";
-import { ReducerActionType } from "../actions";
+import { ReducerAction, ReducerActionType } from "../actions";
 
 export type DragSelectStore = {
   isDragging: boolean;
   origin: Coordinate;
   location: Coordinate;
-};
-
-export type DragSelectAction = {
-  type: string
-  value: any
 };
 
 const defaultStore = {
@@ -27,7 +22,7 @@ const defaultStore = {
 export default function (state: DragSelectStore = defaultStore, {
   type,
   value
-}: DragSelectAction) {
+}: ReducerAction) {
   switch (type) {
     case ReducerActionType.SET_IS_DRAGGING:
       return {
