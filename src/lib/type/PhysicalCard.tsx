@@ -5,6 +5,7 @@ type PhysicalCard = {
   card: Card;
   copy: number;
   coordinate: Coordinate;
+  locationId: string;
   isTapped?: boolean;
   isFlipped?: boolean;
 };

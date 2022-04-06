@@ -7,7 +7,7 @@ import CardSearch from '../CardSearch/CardSearch';
 import './Deckbox.css'
 
 type DeckboxProps = {
-  addCards: (cards: CountedCollection<Card>) => void
+  addCards: (cards: CountedCollection<Card>, locationId: string) => void
 };
 
 const Deckbox: FC<DeckboxProps> = ({ addCards }) => {
@@ -50,7 +50,7 @@ const Deckbox: FC<DeckboxProps> = ({ addCards }) => {
           <button
             className="button" 
             disabled={cards.getTotalCount() === 0 ? true : false} 
-            onClick={() => addCards(cards)}
+            onClick={() => addCards(cards, "playmat")}
           >
             Add to Playmat
           </button>

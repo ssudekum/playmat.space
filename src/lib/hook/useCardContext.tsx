@@ -1,11 +1,9 @@
-import React, { useEffect, createContext, useReducer, Reducer } from 'react'
+import React, { useEffect, createContext, useReducer, Reducer, useCallback } from 'react'
 import Card from '../type/Card';
 import PhysicalCard, { cardEquals } from '../type/PhysicalCard';
 import CountedCollection from '../class/CountedCollection';
-import CardDropHandler from '../class/CardDropHandler';
 
 type CardState = {
-  contextId: string,
   cardStack: PhysicalCard[],
   selectedCards: PhysicalCard[],
   cardCollection: CountedCollection<Card>,
@@ -14,14 +12,13 @@ type CardState = {
 };
 
 const defaultState = {
-  contextId: "",
   cardStack: [],
   selectedCards: [],
   cardCollection: new CountedCollection<Card>(),
 };
 
 export type CardContext = CardState & {
-  addCards: (cards: CountedCollection<Card>) => void,
+  addCards: (cards: CountedCollection<Card>, locationId: string) => void,
   removeCards: (cards: PhysicalCard[]) => void,
   setCardState: React.Dispatch<Partial<CardState>>,
 };
@@ -37,7 +34,7 @@ export const defaultCardContext = {
 
 export const getCardContext = () => createContext<CardContext>(defaultCardContext);
 
-const useCardContext = (id: string): { context: CardContext, handler: CardDropHandler } => {
+const useCardContext = (): CardContext => {
   const [state, setState] = useReducer<Reducer<CardState, Partial<CardState>>>(
     (state, newState) => ({...state, ...newState}), 
     defaultState
@@ -51,7 +48,7 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
     isDraggingSelection,
   } = state;
 
-  const addCards = (adds: CountedCollection<Card>) => {
+  const addCards = (adds: CountedCollection<Card>, locationId: string) => {
     const nextCardCollection = new CountedCollection(cardCollection);
     const nextCardStack = [...cardStack];
     for (const card of Object.values(adds.items)) {
@@ -61,6 +58,7 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
         nextCardStack.push({
           card,
           copy: nextCardCollection.counts[card.id],
+          locationId,
           coordinate: {
             x: document.body.clientWidth / 2,
             y: document.body.clientHeight / 2,
@@ -75,7 +73,7 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
     });
   };
 
-  const removeCards = (physicalCards: PhysicalCard[]) => {
+  const removeCards = useCallback((physicalCards: PhysicalCard[]) => {
     const nextCardStack = [...cardStack];
     const nextSelectedCards = [...selectedCards];
     const nextCardCollection = new CountedCollection(cardCollection);
@@ -94,7 +92,7 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
       selectedCards: nextSelectedCards,
       cardCollection: nextCardCollection,
     });
-  };
+  }, [cardStack, selectedCards, cardCollection, setState]);
 
   useEffect(() => {
     const removeCardsHandler = (event: KeyboardEvent) => {
@@ -107,10 +105,9 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
     return () => {
       document.removeEventListener('keydown', removeCardsHandler);
     };
-  }, [cardStack, selectedCards, cardCollection]);
+  }, [selectedCards, removeCards]);
 
-  const thisContext: CardContext = {
-    contextId: id,
+  return {
     cardStack,
     selectedCards,
     cardCollection,
@@ -119,11 +116,6 @@ const useCardContext = (id: string): { context: CardContext, handler: CardDropHa
     addCards,
     removeCards,
     setCardState: setState
-  };
-
-  return {
-    context: thisContext,
-    handler: new CardDropHandler(thisContext),
   };
 }
 

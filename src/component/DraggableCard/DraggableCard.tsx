@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useMemo } from 'react';
+import React, { MouseEvent, useContext, useEffect, useMemo } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,20 +8,18 @@ import { RootState } from '../../redux';
 import { hideContextMenus } from '../../redux/actions';
 import { BASE_VERTICAL_CARD_HEIGHT } from '../../redux/reducers/CardSizeReducer';
 import ContextMenuTrigger from '../ContextMenu/ContextMenuTrigger';
-import { CardContext } from '../../lib/hook/useCardContext';
-import './DraggableCard.css';
 import { PhysicalCardsDO } from '../DragPreview/CustomDragLayer';
+import { PlaymatCardContext } from '../Playmat/Playmat';
+import './DraggableCard.css';
 
 export type DraggableCardProps = {
   zIndex: number,
   draggableCard: PhysicalCard,
-  cardContext: CardContext,
 };
 
 const DraggableCard: React.FC<DraggableCardProps> = ({
   zIndex,
   draggableCard,
-  cardContext,
 }) => {
   const dispatch = useDispatch();
   const copyId = getCopyId(draggableCard);
@@ -30,7 +28,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
     isAnimationAllowed,
     isDraggingSelection,
     setCardState,
-  } = cardContext;
+  } = useContext(PlaymatCardContext);
 
   const [{isDragging}, drag, preview] = useDrag<
     PhysicalCardsDO, 
@@ -39,13 +37,10 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
   >({
     type: Draggable.PHYSICAL_CARDS,
     item: (): PhysicalCardsDO => {
-      console.log(draggableCard);
       return {
         type: Draggable.PHYSICAL_CARDS,
         cards: selectedCards,
         anchor: draggableCard,
-        sourceContextId: cardContext.contextId,
-        sourceContextRemoval: cardContext.removeCards,
       };
     },
     collect: (monitor) => ({
@@ -115,7 +110,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({
 
   const cardSize = useSelector((state: RootState) => state.cardSizeReducer.size);
   return (
-    <ContextMenuTrigger id={`${cardContext.contextId}-menu`} zIndex={zIndex}>
+    <ContextMenuTrigger id={`playmat-menu`} zIndex={zIndex}>
       <img
         id={copyId}
         ref={drag}

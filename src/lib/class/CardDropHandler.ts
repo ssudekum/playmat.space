@@ -2,33 +2,32 @@ import { DropTargetMonitor } from "react-dnd";
 import Card from "../type/Card";
 import PhysicalCard, { cardEquals, isPhysicalCard } from "../type/PhysicalCard";
 import CountedCollection from "./CountedCollection";
-import { CardsDO, isPhysicalCardsDO, PhysicalCardsDO } from "../../component/DragPreview/CustomDragLayer";
+import { CardsDO, PhysicalCardsDO } from "../../component/DragPreview/CustomDragLayer";
 import { CardContext } from "../hook/useCardContext";
 
 export type CardDO = CardsDO | PhysicalCardsDO;
 
 export default class CardDropHandler {
+  locationId: string;
   context: CardContext;
-  nextCardStack: PhysicalCard[];
-  nextSelectedCards: PhysicalCard[];
-  nextCardCollection: CountedCollection<Card>;
+  nextCardStack: PhysicalCard[] = [];
+  nextSelectedCards: PhysicalCard[] = [];
+  nextCardCollection: CountedCollection<Card> = new CountedCollection();
 
-  constructor(context: CardContext) {
+  constructor(locationId: string, context: CardContext) {
     this.context = context;
-    this.nextCardStack = [...context.cardStack];
-    this.nextSelectedCards = [...context.selectedCards];
-    this.nextCardCollection = new CountedCollection(context.cardCollection);
+    this.locationId = locationId;
   }
 
   drop(dropped: CardDO, target: DropTargetMonitor) {
+    this.nextCardStack = [...this.context.cardStack];
+    this.nextSelectedCards = [...this.context.selectedCards];
+    this.nextCardCollection = new CountedCollection(this.context.cardCollection);
+
     const newPhysicalCards: PhysicalCard[] = [];
     dropped.cards.forEach((card: Card | PhysicalCard) => this.dropCard(card, target, newPhysicalCards));
-    
     if (newPhysicalCards.length) {
       this.nextSelectedCards = newPhysicalCards;
-    }
-    if (isPhysicalCardsDO(dropped) && dropped.sourceContextId !== this.context.contextId) {
-      dropped.sourceContextRemoval(dropped.cards);
     }
 
     this.context.setCardState({
@@ -39,29 +38,20 @@ export default class CardDropHandler {
   }
 
   private dropCard(dropped: Card | PhysicalCard, target: DropTargetMonitor, newPhysicalCards: PhysicalCard[]) {
-    let card: Card;
-    let stackIndex = -1;
-    let selectedIndex = -1;
-    if (isPhysicalCard(dropped)) {
-      stackIndex = this.nextCardStack.findIndex((stackCard) => cardEquals(stackCard, dropped));
-      selectedIndex = this.nextSelectedCards.findIndex((selectedCard) => cardEquals(selectedCard, dropped));
-      card = dropped.card;
-    } else {
-      card = dropped;
-    }
-  
-    const isNewCard = stackIndex === -1;
     let nextPhysicalCard: PhysicalCard;
-    if (isNewCard) {
-      nextPhysicalCard = this.createPhysicalCard(card, target);
-      newPhysicalCards.push(nextPhysicalCard)
-    } else {
-      nextPhysicalCard = this.updatePhysicalCard(
-        stackIndex,
-        selectedIndex,
-        target
-      );
+    if (isPhysicalCard(dropped)) {
+      const stackIndex = this.nextCardStack.findIndex((stackCard) => cardEquals(stackCard, dropped));
+      const stackCard = this.nextCardStack.splice(stackIndex, 1)[0];
+      const selectedIndex = this.nextSelectedCards.findIndex((selectedCard) => cardEquals(selectedCard, dropped));
+      if (selectedIndex !== -1) {
+        this.nextSelectedCards.splice(selectedIndex, 1);
+      }
+
+      nextPhysicalCard = this.updatePhysicalCard(stackCard, target);
       this.nextSelectedCards.push(nextPhysicalCard);
+    } else {
+      nextPhysicalCard = this.createPhysicalCard(dropped, target);
+      newPhysicalCards.push(nextPhysicalCard)
     }
   
     this.nextCardStack.push(nextPhysicalCard);
@@ -70,7 +60,8 @@ export default class CardDropHandler {
   private createPhysicalCard(card: Card, target: DropTargetMonitor): PhysicalCard {
     let offsetX = 0;
     let offsetY = 0;
-    if (this.context.contextId === 'playmat') {
+
+    if (this.locationId === "playmat") {
       const offset = target.getSourceClientOffset();
       offsetX = offset?.x ?? document.body.clientWidth / 2;
       offsetY = offset?.y ?? document.body.clientHeight / 2;
@@ -78,8 +69,9 @@ export default class CardDropHandler {
     }
 
     return {
-      card: card,
+      card,
       copy: this.nextCardCollection.counts[card.id],
+      locationId: this.locationId,
       coordinate: {
         x: offsetX,
         y: offsetY,
@@ -88,28 +80,32 @@ export default class CardDropHandler {
   }
   
   private updatePhysicalCard(
-    stackIndex: number,
-    selectedIndex: number,
+    card: PhysicalCard,
     target: DropTargetMonitor,
   ): PhysicalCard {
     let offsetX = 0;
     let offsetY = 0;
-    if (this.context.contextId === 'playmat') {
-      const offset = target.getDifferenceFromInitialOffset();
-      offsetX = offset?.x ?? document.body.clientWidth / 2;
-      offsetY = offset?.y ?? document.body.clientHeight / 2;
+    let targetOffset;
+
+    if (this.locationId === "playmat" && card.locationId === "playmat") {
+      targetOffset = target.getDifferenceFromInitialOffset();
+    } else if (this.locationId === "playmat") {
+      targetOffset = target.getSourceClientOffset();
     }
-    
-    const stackCard = this.nextCardStack.splice(stackIndex, 1)[0];
-    if (selectedIndex !== -1) {
-      this.nextSelectedCards.splice(selectedIndex, 1);
+
+    if (targetOffset) {
+      offsetX = targetOffset?.x ?? document.body.clientWidth / 2;
+      offsetY = targetOffset?.y ?? document.body.clientHeight / 2;
+      offsetX += card.coordinate.x;
+      offsetY += card.coordinate.y;
     }
   
     return {
-      ...stackCard,
+      ...card,
+      locationId: this.locationId,
       coordinate: {
-        x: stackCard.coordinate.x + offsetX,
-        y: stackCard.coordinate.y + offsetY,
+        x: offsetX,
+        y: offsetY,
       }
     };
   }

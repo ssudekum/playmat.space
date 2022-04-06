@@ -13,13 +13,10 @@ const PlaymatContextMenu: FC = () => {
   } = useContext(PlaymatCardContext);
 
   const flip = () => {
-    let nextSelectedCards = [...selectedCards];
-    nextSelectedCards = nextSelectedCards.map((selectedCard) => {
-      selectedCard.isFlipped = !selectedCard.isFlipped;
-      return selectedCard;
-    });
+    const nextSelectedCards = [...selectedCards];
+    nextSelectedCards.forEach(card => card.isFlipped = !card.isFlipped);
     setCardState({
-      selectedCards: nextSelectedCards
+      selectedCards: nextSelectedCards,
     });
   };
 

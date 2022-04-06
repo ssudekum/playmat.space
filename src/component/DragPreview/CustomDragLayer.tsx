@@ -19,8 +19,6 @@ export type CardsDO = DragObjectWithType & {
 export type PhysicalCardsDO = DragObjectWithType & {
   cards: PhysicalCard[];
   anchor: PhysicalCard;
-  sourceContextId: string;
-  sourceContextRemoval: (cards: PhysicalCard[]) => void
 };
 
 export type ZoneDO = DragObjectWithType & {
